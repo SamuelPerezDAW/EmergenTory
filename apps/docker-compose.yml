@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./api
+    # Añadimos el comando de ejecución aquí
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./api:/app
+    ports:
+      - "8000:8000"
+
+  main:
+    build: ./main
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./main:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
