@@ -7,11 +7,8 @@ class CheckitemSerializer(BaseSerializer):
     def serialize_instance(self, instance) -> dict:
         return {
             'id': instance.pk,
-            'title': instance.title,
-            'slug': instance.slug,
-            'content': instance.content,
-            'created_at': instance.created_at.isoformat(),
-            'updated_at': instance.updated_at.isoformat(),
+            'name': instance.name,
+            'active': instance.active,
         }
 
 
