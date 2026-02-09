@@ -1,5 +1,2 @@
-bin
-lib
-lib64
-include
-pyvenv.cfg
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*
