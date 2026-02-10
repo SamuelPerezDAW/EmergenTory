@@ -5,13 +5,13 @@ from .models import Checkitem, Checklist
 
 @admin.register(Checklist)
 class ChecklistAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'vehicle', 'created_at', 'updated_at')
-    search_fields = ('pk', 'vehicle', 'created_at', 'updated_at')
-    raw_id_fields = ('checkitem',)
-    filter_horizontal = ('user',)
+    list_display = ('pk', 'vehiculo', 'creado', 'actualizado')
+    search_fields = ('pk', 'vehiculo', 'creado', 'actualizado')
+    raw_id_fields = ('item',)
+    filter_horizontal = ('usuario',)
 
 
 @admin.register(Checkitem)
 class CheckItemAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'active')
-    search_fields = ('pk', 'name', 'active')
+    list_display = ('pk', 'nombre', 'activo')
+    search_fields = ('pk', 'nombre', 'activo')

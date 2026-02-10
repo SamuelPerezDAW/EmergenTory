@@ -1,4 +1,5 @@
 from shared.serializers import BaseSerializer
+from users.serializers import UserSerializer
 
 
 class VehicleSerializer(BaseSerializer):
@@ -8,4 +9,6 @@ class VehicleSerializer(BaseSerializer):
             'matricula': instance.matricula,
             'marca': instance.marca,
             'modelo': instance.modelo,
+            'categoria': instance.categoria,
+            'usuario': UserSerializer(instance.usuario).serialize(),
         }

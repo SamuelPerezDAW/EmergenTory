@@ -19,7 +19,7 @@ def auth_required(func):
             token = Token.objects.get(key=m['token'])
         except Token.DoesNotExist:
             return JsonResponse({'error': 'Unregistered authentication token'}, status=401)
-        request.user = token.user
+        request.user = token.usuario
         return func(request, *args, **kwargs)
 
     return wrapper

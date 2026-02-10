@@ -8,9 +8,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars', default='avatars/noavatar.png')
     bio = models.TextField(blank=True)
-    phone_number = PhoneNumberField(region='ES', blank=True, null=True)
+    telefono = PhoneNumberField(region='ES', blank=True, null=True)
     admin = models.BooleanField(default=False)
-    user = models.OneToOneField(
+    usuario = models.OneToOneField(
         settings.AUTH_USER_MODEL, related_name='profile', on_delete=models.CASCADE
     )
 
@@ -20,8 +20,8 @@ class Profile(models.Model):
 
 class Token(models.Model):
     key = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.key)
