@@ -7,4 +7,3 @@ from .models import Vehicle
 class VehicleAdmin(admin.ModelAdmin):
     list_display = ('pk', 'matricula', 'marca', 'modelo', 'categoria')
     search_fields = ('pk', 'matricula', 'marca', 'modelo', 'categoria')
-    filter_horizontal = ('usuario',)

@@ -7,7 +7,7 @@ from .models import Checkitem, Checklist
 class ChecklistAdmin(admin.ModelAdmin):
     list_display = ('pk', 'vehiculo', 'creado', 'actualizado')
     search_fields = ('pk', 'vehiculo', 'creado', 'actualizado')
-    raw_id_fields = ('item',)
+    raw_id_fields = ('vehiculo',)
     filter_horizontal = ('usuario',)
 
 
