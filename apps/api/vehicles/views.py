@@ -90,3 +90,19 @@ def add_vehicle(request):
         return JsonResponse({'error': str(error.message)}, status=400)
 
     return JsonResponse({'id': vehicle.pk})
+
+
+@csrf_exempt
+@require_http_methods('POST')
+@auth_required
+@require_admin
+def del_vehicle(request, matricula):
+    try:
+        Vehicle.objects.get(matricula=matricula)
+
+        vehicle = Vehicle.objects.filter(matricula=matricula).delete()
+
+    except Vehicle.DoesNotExist:
+        return JsonResponse({'error': 'Vehículo no encontrado'}, status=404)
+
+    return JsonResponse({'id': vehicle})

@@ -144,6 +144,8 @@ def mod_item(request, matricula, nombre_item):
 
 @csrf_exempt
 @require_http_methods('POST')
+@auth_required
+@require_admin
 def del_item(request, matricula, nombre_item):
     try:
         checklist = Checklist.objects.get(vehiculo__matricula=matricula)
@@ -152,9 +154,6 @@ def del_item(request, matricula, nombre_item):
         item = Checkitem.objects.filter(
             nombre=nombre_item, checklist__vehiculo__matricula=checklist
         ).delete()
-
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Json inválido'}, status=400)
 
     except Checkitem.DoesNotExist:
         return JsonResponse({'error': 'Item no encontrado'}, status=404)
