@@ -3,7 +3,13 @@ from django.db import models
 
 
 class Checklist(models.Model):
-    usuario = models.ManyToManyField(get_user_model(), related_name='checklists')
+    usuario = models.ForeignKey(
+        get_user_model(),
+        related_name='checklists',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
     vehiculo = models.OneToOneField(
         'vehicles.Vehicle', related_name='checklist', on_delete=models.CASCADE, unique=True
     )
