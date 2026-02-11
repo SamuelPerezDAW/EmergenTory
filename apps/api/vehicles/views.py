@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from shared.decorators import require_http_methods
+from shared.decorators import require_admin, require_http_methods
 from users.decorators import auth_required
 
 from .models import Vehicle
@@ -40,6 +40,7 @@ def vehicle_list(request):
 @csrf_exempt
 @require_http_methods('POST')
 @auth_required
+@require_admin
 def add_vehicle(request):
     try:
         payload = json.loads(request.body)
