@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from shared.decorators import require_admin, require_http_methods
 
 from .decorators import auth_profile, auth_required
-from .models import Profile
+from .models import Profile, Token
 from .serializers import ProfileSerializer
 
 
@@ -72,3 +72,27 @@ def add_user(request):
     except IntegrityError:
         return JsonResponse({'error': 'El usuario ya existe'}, status=400)
     return JsonResponse({'id': user.pk})
+
+
+@csrf_exempt
+@require_http_methods('POST')
+@auth_required
+def del_user(request, nombre_usuario):
+    try:
+        bearer_token = request.headers.get('Authorization', '')
+        token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
+        get_user_model().objects.get(username=nombre_usuario)
+        perfil_validar = Profile.objects.get(usuario=token.usuario)
+        perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
+        # Añadir usuario admin y usuario propietario sin el auth
+        usuario = get_user_model().objects.filter(username=nombre_usuario).delete()
+
+    except Token.DoesNotExist:
+        return JsonResponse({'error': 'Token no existe'}, status=404)
+
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Perfil no existe'}, status=404)
+    except get_user_model().DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+    return JsonResponse({'id': usuario})
