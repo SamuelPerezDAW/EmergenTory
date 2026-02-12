@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'vehicles.apps.VehiclesConfig',
     'checklists.apps.ChecklistsConfig',
     'shared.apps.SharedConfig',
-    'phonenumber_field',
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model, hashers
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -69,6 +70,9 @@ def add_user(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Json inválido'}, status=400)
 
+    except ValidationError:
+        return JsonResponse({'error': 'Formato inválido de teléfono'}, status=400)
+
     except IntegrityError:
         return JsonResponse({'error': 'El usuario ya existe'}, status=400)
     return JsonResponse({'id': user.pk})
@@ -81,11 +85,19 @@ def del_user(request, nombre_usuario):
     try:
         bearer_token = request.headers.get('Authorization', '')
         token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
-        get_user_model().objects.get(username=nombre_usuario)
+        usuario = get_user_model().objects.get(username=nombre_usuario)
+
         perfil_validar = Profile.objects.get(usuario=token.usuario)
         perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
-        # Añadir usuario admin y usuario propietario sin el auth
-        usuario = get_user_model().objects.filter(username=nombre_usuario).delete()
+
+        if Profile.objects.get(usuario=token.usuario).admin:
+            usuario = get_user_model().objects.filter(username=nombre_usuario).delete()
+
+        elif perfil_original == perfil_validar:
+            usuario = get_user_model().objects.filter(username=nombre_usuario).delete()
+
+        else:
+            return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)
 
     except Token.DoesNotExist:
         return JsonResponse({'error': 'Token no existe'}, status=404)
@@ -96,3 +108,85 @@ def del_user(request, nombre_usuario):
         return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
     return JsonResponse({'id': usuario})
+
+
+@csrf_exempt
+@require_http_methods('POST')
+@auth_required
+def mod_profile(request, nombre_usuario):
+    try:
+        payload = json.loads(request.body)
+        bearer_token = request.headers.get('Authorization', '')
+        token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
+
+        perfil_validar = Profile.objects.get(usuario=token.usuario)
+        perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
+        mod_user = get_user_model().objects.filter(username=nombre_usuario)
+        mod_profile = Profile.objects.filter(usuario__username=nombre_usuario)
+        data = {'actualizados': []}
+        if Profile.objects.get(usuario=token.usuario).admin:
+            if 'nombre_usuario' in payload:
+                if get_user_model().objects.filter(username=payload['nombre_usuario']):
+                    return JsonResponse({'error': 'El usuario ya existe'}, status=400)
+
+                data['actualizados'] += {'id': mod_user.update(username=payload['nombre_usuario'])}
+
+            if 'nombre' in payload:
+                data['actualizados'] += {'id': mod_user.update(first_name=payload['nombre'])}
+
+            if 'apellidos' in payload:
+                data['actualizados'] += {'id': mod_user.update(last_name=payload['apellidos'])}
+
+            if 'email' in payload:
+                data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
+
+            if 'bio' in payload:
+                data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
+
+            if 'avatar' in payload:
+                data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
+
+            if 'telefono' in payload:
+                data['actualizados'] += {'id': mod_profile.update(telefono=payload['telefono'])}
+
+        elif perfil_original == perfil_validar:
+            if 'nombre_usuario' in payload:
+                if get_user_model().objects.filter(username=payload['nombre_usuario']):
+                    return JsonResponse({'error': 'El usuario ya existe'}, status=400)
+
+                data['actualizados'] += {'id': mod_user.update(username=payload['nombre_usuario'])}
+
+            if 'nombre' in payload:
+                data['actualizados'] += {'id': mod_user.update(first_name=payload['nombre'])}
+
+            if 'apellidos' in payload:
+                data['actualizados'] += {'id': mod_user.update(last_name=payload['apellidos'])}
+
+            if 'email' in payload:
+                data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
+
+            if 'bio' in payload:
+                data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
+
+            if 'avatar' in payload:
+                data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
+
+            if 'telefono' in payload:
+                data['actualizados'] += {'id': mod_profile.update(telefono=payload['telefono'])}
+
+        else:
+            return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)
+
+    except Token.DoesNotExist:
+        return JsonResponse({'error': 'Token no existe'}, status=404)
+
+    except ValidationError:
+        return JsonResponse({'error': 'Token no existe'}, status=404)
+
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Perfil no existe'}, status=404)
+
+    except get_user_model().DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+    return JsonResponse(data)

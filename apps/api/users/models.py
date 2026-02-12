@@ -1,14 +1,23 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars', default='avatars/noavatar.png')
     bio = models.TextField(blank=True)
-    telefono = PhoneNumberField(region='ES', blank=True, null=True)
+    telefono = models.CharField(
+        max_length=32,
+        validators=[
+            RegexValidator(
+                regex='/^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'
+            )
+        ],
+        blank=True,
+        null=True,
+    )
     admin = models.BooleanField(default=False)
     usuario = models.OneToOneField(
         settings.AUTH_USER_MODEL, related_name='profile', on_delete=models.CASCADE
