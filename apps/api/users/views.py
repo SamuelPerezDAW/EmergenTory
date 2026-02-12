@@ -147,7 +147,11 @@ def mod_profile(request, nombre_usuario):
                 data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
 
             if 'telefono' in payload:
-                data['actualizados'] += {'id': mod_profile.update(telefono=payload['telefono'])}
+                profile_phone = mod_profile.first()
+                profile_phone.telefono = payload['telefono']
+                profile_phone.full_clean()
+                profile_phone.save()
+                data['actualizados'] += {'id': mod_profile.first().pk}
 
         elif perfil_original == perfil_validar:
             if 'nombre_usuario' in payload:
@@ -172,7 +176,10 @@ def mod_profile(request, nombre_usuario):
                 data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
 
             if 'telefono' in payload:
-                data['actualizados'] += {'id': mod_profile.update(telefono=payload['telefono'])}
+                mod_profile.first().telefono = payload['telefono']
+                mod_profile.first().full_clean()
+                mod_profile.first().save()
+                data['actualizados'] += {'id': mod_profile.first().pk}
 
         else:
             return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)
@@ -181,7 +188,59 @@ def mod_profile(request, nombre_usuario):
         return JsonResponse({'error': 'Token no existe'}, status=404)
 
     except ValidationError:
+        return JsonResponse({'error': 'Teléfono no válido'}, status=400)
+
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Perfil no existe'}, status=404)
+
+    except get_user_model().DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+    return JsonResponse(data)
+
+
+@csrf_exempt
+@require_http_methods('POST')
+@auth_required
+def reset_password(request, nombre_usuario):
+    try:
+        payload = json.loads(request.body)
+        bearer_token = request.headers.get('Authorization', '')
+        token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
+
+        perfil_validar = Profile.objects.get(usuario=token.usuario)
+        perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
+        mod_user = get_user_model().objects.filter(username=nombre_usuario)
+
+        data = {'actualizados': []}
+        if Profile.objects.get(usuario=token.usuario).admin:
+            if 'contraseña' in payload:
+                data['actualizados'] += {
+                    'id': mod_user.update(
+                        password=hashers.make_password(
+                            payload['contraseña'], salt=None, hasher='default'
+                        ),
+                    )
+                }
+
+        elif perfil_original == perfil_validar:
+            if 'contraseña' in payload:
+                data['actualizados'] += {
+                    'id': mod_user.update(
+                        password=hashers.make_password(
+                            payload['contraseña'], salt=None, hasher='default'
+                        ),
+                    )
+                }
+
+        else:
+            return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)
+
+    except Token.DoesNotExist:
         return JsonResponse({'error': 'Token no existe'}, status=404)
+
+    except ValidationError:
+        return JsonResponse({'error': 'Teléfono no válido'}, status=400)
 
     except Profile.DoesNotExist:
         return JsonResponse({'error': 'Perfil no existe'}, status=404)

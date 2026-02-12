@@ -10,4 +10,7 @@ urlpatterns = [
     path('perfil/<str:nombre_usuario>/', views.user_profile, name='user-profile'),
     path('perfil/<str:nombre_usuario>/mod/', views.mod_profile, name='mod-profile'),
     path('perfil/<str:nombre_usuario>/del/', views.del_user, name='del-user'),
+    path(
+        'perfil/<str:nombre_usuario>/reset-password/', views.reset_password, name='reset-password'
+    ),
 ]
