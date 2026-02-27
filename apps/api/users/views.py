@@ -124,6 +124,9 @@ def mod_profile(request, nombre_usuario):
         mod_user = get_user_model().objects.filter(username=nombre_usuario)
         mod_profile = Profile.objects.filter(usuario__username=nombre_usuario)
         data = {'actualizados': []}
+
+        # En caso de que el usuario que está haciendo la petición tenga el rol de admin, se le permite hacerlo.
+        # En caso contrario se comprueba que el usuario sea el propietario.
         if Profile.objects.get(usuario=token.usuario).admin:
             if 'nombre_usuario' in payload:
                 if get_user_model().objects.filter(username=payload['nombre_usuario']):
