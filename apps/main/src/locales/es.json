@@ -1,0 +1,29 @@
+{
+    "proyectos": {
+        "cards": [
+        {
+            "title": "Portfolio Vue",
+            "description": "Portfolio personal con Vue y Tailwind",
+            "tags": ["Vue", "Tailwind", "Vite"],
+            "demourl": "https://example.com",
+            "codeurl": "https://github.com"
+        }
+    ]
+  },
+    "habilidades": {
+        "cards": [
+        {
+            "name": "Vue",
+            "description": "Usado en proyectos personales y académicos",
+            "level": 4,
+            "logo": "vue"
+        },
+        {
+            "name": "Tailwind",
+            "description": "Estilos rápidos y responsive",
+            "level": 3,
+            "logo": "tailwind"
+        }
+        ]
+    }
+}
