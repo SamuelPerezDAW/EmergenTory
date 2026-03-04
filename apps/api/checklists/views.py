@@ -111,6 +111,8 @@ def add_item(request):
 
 @csrf_exempt
 @require_http_methods('POST')
+@auth_require
+@require_admin
 def mod_item(request, matricula, nombre_item):
     try:
         payload = json.loads(request.body)

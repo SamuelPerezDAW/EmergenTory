@@ -68,7 +68,7 @@ Lista los vehiculos guardados en la base de datos
   GET: /api/users/vehicles/
 ```
 
-Añade un nuevo vehiculo a la base de datos que a su vez crea una checklist para este vehículo
+Añade un nuevo vehiculo a la base de datos que a su vez genera una checklist para este vehículo
 
 ```
   POST: /api/users/vehicles/add/
@@ -80,6 +80,47 @@ Elimina el vehiculo seleccionado junto a su checklist con todos los respectivos 
 
 ```
   POST: /api/users/vehicles/del/
+```
+
+- [x] Admin necesario
+
+### Checklist
+
+Permite revisar las listas de la base de datos
+
+```
+  POST: /api/checklists/
+```
+
+### Checkitem
+
+Permite revisar los items de cada lista
+
+```
+  POST: /api/checklists/checkitems/
+```
+
+Añade un item a una lista en concreto
+
+```
+  POST: /api/checklists/checkitems/add/
+```
+
+- [x] Admin necesario
+- [x] Token propietario necesario
+
+Modifica el item de la lista seleccionada
+
+```
+  POST: /api/checklists/matricula/nombre_item/mod/
+```
+
+- [x] Admin necesario
+
+Elimina el item de la lista seleccionada
+
+```
+  POST: /api/checklists/matricula/nombre_item/del/
 ```
 
 - [x] Admin necesario
