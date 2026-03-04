@@ -1,3 +1,7 @@
+---
+icon: lucide/plugs
+---
+
 La API está hecha en el Framework Django, en el cual está desarrollado en el lenguaje de programación Python.
 
 ## Objetivo
