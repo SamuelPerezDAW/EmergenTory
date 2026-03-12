@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'vehicles.apps.VehiclesConfig',
     'checklists.apps.ChecklistsConfig',
     'shared.apps.SharedConfig',
+    'django_rq',
 ]
 
 MIDDLEWARE = [
@@ -122,3 +123,11 @@ STATIC_URL = 'static/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = 'media/'
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    },
+}

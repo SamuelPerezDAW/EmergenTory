@@ -96,6 +96,34 @@ def add_vehicle(request):
 @require_http_methods('POST')
 @auth_required
 @require_admin
+def change_vehicle_image(request, matricula):
+    try:
+        payload = json.loads(request.body)
+
+        vehicle = Vehicle.objects.filter(matricula=matricula)
+
+        if not vehicle:
+            return JsonResponse({'error': 'Vehiculo no encontrado'}, status=404)
+
+        if 'imagen' in payload:
+            vehicle.update(imagen=payload['imagen'])
+
+        else:
+            return JsonResponse({'error', 'Falta el campo imagen'}, status=400)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Json inválido'}, status=400)
+
+    except ValidationError as error:
+        return JsonResponse({'error': str(error.message)}, status=400)
+
+    return JsonResponse({'id': vehicle})
+
+
+@csrf_exempt
+@require_http_methods('POST')
+@auth_required
+@require_admin
 def del_vehicle(request, matricula):
     try:
         Vehicle.objects.get(matricula=matricula)

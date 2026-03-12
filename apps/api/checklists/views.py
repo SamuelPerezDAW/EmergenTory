@@ -111,7 +111,7 @@ def add_item(request):
 
 @csrf_exempt
 @require_http_methods('POST')
-@auth_require
+@auth_required
 @require_admin
 def mod_item(request, matricula, nombre_item):
     try:

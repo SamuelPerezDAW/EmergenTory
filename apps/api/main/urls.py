@@ -6,4 +6,5 @@ urlpatterns = [
     path('api/users/', include('users.urls')),
     path('api/vehicles/', include('vehicles.urls')),
     path('api/checklists/', include('checklists.urls')),
+    path('django-rq/', include('django_rq.urls')),
 ]
