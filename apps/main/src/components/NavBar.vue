@@ -8,7 +8,7 @@
 
       <!-- DERECHA (ESCRITORIO) -->
       <nav class="hidden sm:flex gap-6 text-sm text-white/70">
-        <RouterLink to="/#sobre-mi" class="hover:text-white">Sobre mí</RouterLink>
+        <RouterLink to="/#" class="hover:text-white"></RouterLink>
         
       </nav>
 
