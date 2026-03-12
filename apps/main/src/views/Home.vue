@@ -1,4 +1,5 @@
 <template>
+  <h1>Cosas</h1>
   <section class="dashboard">
     <header class="dashboard__header">
       <h1 class="dashboard__title">
@@ -83,16 +84,18 @@
 </template>
 
 <script setup lang="ts">
+console.log("Estoy aquí")
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { useVehicleStore } from '@/stores/vehicleStore';
-import VehicleCard from '@/components/VehicleCard.vue';
+import { useVehicleStore } from '../stores/vehicleStore.vue';
+import VehicleCard from '../components/VehicleCard.vue';
 
 interface Vehicle {
   id: string;
   name: string;
   plate: string;
+  items: [];
   active: boolean;
   itemsCount?: number;
 }
@@ -105,7 +108,7 @@ const emit = defineEmits<{
   (e: 'open-vehicle-items', payload: { vehicleId: string }): void;
 }>();
 
-const vehicleStore = useVehicleStore();
+const vehicleStore = useVehicleStore;
 const { vehicles, isLoading, error } = storeToRefs(vehicleStore);
 
 const searchTerm = ref<string>('');
