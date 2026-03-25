@@ -1,233 +1,64 @@
 <template>
-  <article class="vehicle-card">
-    <header class="vehicle-card__header">
-      <h2 class="vehicle-card__title">
-        {{ vehicle.name }}
-      </h2>
-
-      <div class="vehicle-card__counters">
-        <span class="badge badge--pending">
-          Pendientes: {{ pendingItemsCount }}
-        </span>
-        <span class="badge badge--completed">
-          Completados: {{ completedItemsCount }}
-        </span>
-        <span class="badge badge--total">
-          Total: {{ totalItems }}
-        </span>
+  <article class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600">{{ vehicle.categoria }}</p>
+        <h3 class="mt-2 text-xl font-semibold text-slate-900">{{ vehicle.marca }} {{ vehicle.modelo }}</h3>
+        <p class="mt-1 text-sm text-slate-500">{{ vehicle.matricula }}</p>
       </div>
-    </header>
+      <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+        {{ activeCount }}/{{ totalCount }} activos
+      </span>
+    </div>
 
-    <section class="vehicle-card__body">
-      <!-- Lista simple para mostrar la reactividad de ref + computed -->
-      <ul class="vehicle-card__items">
-        <li
-          v-for="item in itemsState"
-          :key="item.id"
-          class="vehicle-card__item"
-        >
-          <label class="vehicle-card__item-label">
-            <input
-              type="checkbox"
-              v-model="item.completed"
-            />
-            <span :class="{ 'vehicle-card__item--done': item.completed }">
-              {{ item.label }}
-            </span>
-          </label>
-        </li>
-      </ul>
+    <div class="mt-5 grid grid-cols-3 gap-3 text-center">
+      <div class="rounded-2xl bg-slate-50 px-3 py-3">
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Lista</p>
+        <p class="mt-2 text-lg font-semibold text-slate-900">#{{ vehicle.lista.id }}</p>
+      </div>
+      <div class="rounded-2xl bg-slate-50 px-3 py-3">
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Items</p>
+        <p class="mt-2 text-lg font-semibold text-slate-900">{{ totalCount }}</p>
+      </div>
+      <div class="rounded-2xl bg-slate-50 px-3 py-3">
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Inactivos</p>
+        <p class="mt-2 text-lg font-semibold text-amber-600">{{ inactiveCount }}</p>
+      </div>
+    </div>
 
-      <!-- Slot por defecto para contenido adicional -->
-      <slot />
-    </section>
-
-    <footer class="vehicle-card__footer">
-      <!-- Slot de acciones adicionales -->
-      <slot name="actions" />
-
+    <div class="mt-5 flex flex-wrap items-center gap-3">
       <button
         type="button"
-        class="btn btn--primary"
-        @click="handleSelect"
+        class="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+        @click="$emit('select', vehicle.matricula)"
       >
-        Seleccionar vehículo
+        Ver detalle
       </button>
-    </footer>
+      <button
+        type="button"
+        class="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:bg-brand-50"
+        @click="$emit('manage-items', vehicle.matricula)"
+      >
+        Gestionar items
+      </button>
+    </div>
   </article>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-
-interface VehicleItem {
-  id: string | number;
-  label: string;
-  completed: boolean;
-}
-
-interface Vehicle {
-  id: string | number;
-  name: string;
-  items: VehicleItem[];
-}
+import { computed } from 'vue';
+import type { Vehiculo } from '@/types';
 
 const props = defineProps<{
-  vehicle: Vehicle;
+  vehicle: Vehiculo;
 }>();
 
-const emit = defineEmits<{
-  (e: 'selectVehicle', vehicleId: string | number): void;
+defineEmits<{
+  (event: 'select', matricula: string): void;
+  (event: 'manage-items', matricula: string): void;
 }>();
 
-// ref + reactividad local de items para mostrar cambios en tiempo real
-const itemsState = ref<VehicleItem[]>([...props.vehicle.items]);
-
-// Sincronizar si el vehículo cambia desde el padre
-watch(
-  () => props.vehicle.items,
-  (newItems) => {
-    itemsState.value = [...newItems];
-  },
-  { deep: true }
-);
-
-// computed para contar items
-const totalItems = computed(() => itemsState.value.length);
-
-const completedItemsCount = computed(() =>
-  itemsState.value.filter((item) => item.completed).length
-);
-
-const pendingItemsCount = computed(() =>
-  Math.max(totalItems.value - completedItemsCount.value, 0)
-);
-
-function handleSelect() {
-  emit('selectVehicle', props.vehicle.id);
-}
+const totalCount = computed(() => props.vehicle.lista.items.length);
+const activeCount = computed(() => props.vehicle.lista.items.filter((item) => item.activo).length);
+const inactiveCount = computed(() => totalCount.value - activeCount.value);
 </script>
-
-<style scoped>
-.vehicle-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-}
-
-.vehicle-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.vehicle-card__title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-  color: #111827;
-}
-
-.vehicle-card__counters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  font-size: 0.8rem;
-}
-
-.vehicle-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.vehicle-card__items {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.vehicle-card__item {
-  font-size: 0.9rem;
-}
-
-.vehicle-card__item-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-}
-
-.vehicle-card__item--done {
-  text-decoration: line-through;
-  color: #6b7280;
-}
-
-.vehicle-card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  font-weight: 500;
-}
-
-.badge--pending {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-
-.badge--completed {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.badge--total {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.45rem 0.9rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.05s ease;
-}
-
-.btn--primary {
-  background-color: #2563eb;
-  color: #ffffff;
-}
-
-.btn--primary:hover {
-  background-color: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
-}
-
-.btn--primary:active {
-  transform: translateY(1px);
-  box-shadow: none;
-}
-</style>

@@ -1,0 +1,53 @@
+import { computed, ref } from 'vue';
+import { defineStore } from 'pinia';
+import { loginService, signupService } from '@/services/authService';
+import type { AuthPayload, Usuario } from '@/types';
+
+const TOKEN_KEY = 'emergentory_token';
+const USER_KEY = 'emergentory_user';
+
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref<string | null>(localStorage.getItem(TOKEN_KEY));
+  const user = ref<Usuario | null>(JSON.parse(localStorage.getItem(USER_KEY) ?? 'null'));
+  const loading = ref(false);
+
+  const isAuthenticated = computed(() => Boolean(token.value));
+  const fullName = computed(() => (user.value ? `${user.value.first_name} ${user.value.last_name}` : 'Invitado'));
+
+  const persistSession = (nextToken: string, nextUser: Usuario) => {
+    token.value = nextToken;
+    user.value = nextUser;
+    localStorage.setItem(TOKEN_KEY, nextToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+  };
+
+  const login = async (payload: AuthPayload) => {
+    loading.value = true;
+    try {
+      const response = await loginService(payload);
+      persistSession(response.token, response.user);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const signup = async (payload: AuthPayload) => {
+    loading.value = true;
+    try {
+      const response = await signupService(payload);
+      persistSession(response.token, response.user);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const logout = () => {
+    token.value = null;
+    user.value = null;
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem('emergentory_session_summary');
+  };
+
+  return { token, user, loading, isAuthenticated, fullName, login, signup, logout };
+});
