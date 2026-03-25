@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { RouterView, useRoute, useRouter } from 'vue-router';
-import Navbar from '@/components/Navbar.vue';
+import Navbar from './components/NavBar.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import { useAuthStore } from '@/stores/auth';
 

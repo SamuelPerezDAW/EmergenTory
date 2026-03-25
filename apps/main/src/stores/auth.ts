@@ -7,8 +7,8 @@ const TOKEN_KEY = 'emergentory_token';
 const USER_KEY = 'emergentory_user';
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem(TOKEN_KEY));
-  const user = ref<Usuario | null>(JSON.parse(localStorage.getItem(USER_KEY) ?? 'null'));
+  const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY));
+  const user = ref<Usuario | null>(JSON.parse(sessionStorage.getItem(USER_KEY) ?? 'null'));
   const loading = ref(false);
 
   const isAuthenticated = computed(() => Boolean(token.value));
@@ -17,8 +17,8 @@ export const useAuthStore = defineStore('auth', () => {
   const persistSession = (nextToken: string, nextUser: Usuario) => {
     token.value = nextToken;
     user.value = nextUser;
-    localStorage.setItem(TOKEN_KEY, nextToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+    sessionStorage.setItem(TOKEN_KEY, nextToken);
+    sessionStorage.setItem(USER_KEY, JSON.stringify(nextUser));
   };
 
   const login = async (payload: AuthPayload) => {
@@ -44,8 +44,8 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = () => {
     token.value = null;
     user.value = null;
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
     sessionStorage.removeItem('emergentory_session_summary');
   };
 
