@@ -27,7 +27,7 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
 
   const response = await axios.get(`http://127.0.0.1:8000/api/users/profile/${payload.username}`, {
     headers: {
-      "Authorization": "Bearer f5a7f855-28d9-4c63-91ad-f2381a4a6866"
+      "Authorization": "Bearer da339b35-c8e9-41ea-9cb7-ac21d329df4c"
     }
   })
 
@@ -46,8 +46,17 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
         return {
           token: `token-${payload.username}-emergentory`,
           user: {
-            ...mockUser,
-            username: payload.username,
+            id: data.usuario.id,
+            username: data.usuario.nombre_usuario,
+            email: data.usuario.email,
+            first_name: data.usuario.nombre,
+            last_name: data.usuario.apellido,
+            perfil: {
+              admin: data.admin,
+              avatar: data.avatar,
+              bio: data.bio,
+              telefono: data.telefono,
+            },
           },
         };
       } else {

@@ -9,6 +9,7 @@ class UserSerializer(BaseSerializer):
             'nombre': instance.first_name,
             'apellido': instance.last_name,
             'email': instance.email,
+            'contraseña': instance.password,
         }
 
 
