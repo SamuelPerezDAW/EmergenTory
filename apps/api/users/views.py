@@ -5,18 +5,15 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from shared.decorators import require_admin, require_http_methods
 
-from .decorators import auth_profile, auth_required
+from .decorators import auth_required
 from .models import Profile, Token
 from .serializers import ProfileSerializer
 
 
 @csrf_exempt
 @require_http_methods('GET')
-@auth_required
-@auth_profile
 def user_profile(request, nombre_usuario: str):
     try:
         profile = Profile.objects.get(usuario__username=nombre_usuario)
@@ -143,6 +140,9 @@ def mod_profile(request, nombre_usuario):
             if 'email' in payload:
                 data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
 
+            if 'contraseña' in payload:
+                data['actualizados'] += {'id': mod_user.update(password=payload['contraseña'])}
+
             if 'bio' in payload:
                 data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
 
@@ -171,6 +171,9 @@ def mod_profile(request, nombre_usuario):
 
             if 'email' in payload:
                 data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
+
+            if 'contraseña' in payload:
+                data['actualizados'] += {'id': mod_user.update(password=payload['contraseña'])}
 
             if 'bio' in payload:
                 data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
