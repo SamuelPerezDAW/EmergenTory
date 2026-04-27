@@ -72,6 +72,12 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
 export async function signupService(payload: AuthPayload): Promise<{ token: string; user: Usuario }> {
   await wait();
 
+  const response = await axios.get(`http://127.0.0.1:8000/api/users/profile/${payload.username}`, {
+    headers: {
+      "Authorization": "Bearer da339b35-c8e9-41ea-9cb7-ac21d329df4c"
+    }
+  })
+
   return {
     token: `token-${payload.username}-new`,
     user: {
