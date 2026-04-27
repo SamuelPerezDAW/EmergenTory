@@ -6,37 +6,41 @@
       <h2 class="mt-2 text-3xl font-semibold">{{ user.first_name }} {{ user.last_name }}</h2>
       <p class="mt-2 text-slate-300">{{ user.email }}</p>
       <p class="mt-6 rounded-2xl bg-white/10 p-4 text-sm leading-6 text-slate-200">{{ user.perfil.bio }}</p>
+      <p>{{ user.perfil.admin ? 'Administrador' : 'Operador' }}</p>
     </article>
 
     <article class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
       <p class="text-xs uppercase tracking-[0.35em] text-brand-600">Datos de usuario</p>
       <h2 class="mt-2 text-2xl font-semibold text-slate-900">Información operativa</h2>
 
-      <form action="">
-        <dl class="mt-6 grid gap-4 sm:grid-cols-2">
-          <div class="rounded-2xl bg-slate-50 p-4">
-            <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Usuario</dt>
-            <input v-model="nombre_usuario" class="mt-2 text-lg font-semibold text-slate-900"/>
-          </div>
-          
-          <div class="rounded-2xl bg-slate-50 p-4">
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl bg-slate-50 p-4 w-fit">
+          <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Usuario</dt>
+          <input v-model="nombre_usuario" class="mt-2 text-lg font-semibold text-slate-900"/>
+        </div>
+
+        <div>
+          <div class="rounded-2xl bg-slate-50 p-4 w-fit">
             <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
-            <input type="email" v-model="email" class="mt-2 text-lg font-semibold text-slate-900"/>
+            <input v-model="email" class="mt-2 text-lg font-semibold text-slate-900"/>
           </div>
+          <dd v-if="emailError != ''" class="rounded border border-2 border-red/50 p-2 my-2">{{ emailError }}</dd>
+        </div>
 
-          <div class="rounded-2xl bg-slate-50 p-4">
+        <div>
+          <div class="rounded-2xl bg-slate-50 p-4 w-fit">
             <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Teléfono</dt>
-            <input type="tel" @input="validatePhoneNumber()" v-model="telefono" class="mt-2 text-lg font-semibold text-slate-900"></input>
-            <dd v-if="error != ''" class="rounded border border-2 border-red/50 p-2 my-2">{{ error }}</dd>
+            <input type="tel" v-model="telefono" class="mt-2 text-lg font-semibold text-slate-900"></input>
           </div>
+          <dd v-if="phoneError != ''" class="rounded border border-2 border-red/50 p-2 my-2">{{ phoneError }}</dd>
+        </div>
 
-          <div class="rounded-2xl bg-slate-50 p-4">
-            <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Rol</dt>
-            <dd class="mt-2 text-lg font-semibold text-slate-900">{{ user.perfil.admin ? 'Administrador' : 'Operador' }}</dd>
-          </div>
-        </dl>    
-        <button v-bind:disabled="disableSubmit">Guardar</button>  
-      </form>
+        <div class="rounded-2xl bg-slate-50 p-4 w-fit">
+          <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Rol</dt>
+          <dd class="mt-2 text-lg font-semibold text-slate-900">{{ user.perfil.admin ? 'Administrador' : 'Operador' }}</dd>
+        </div>
+      </dl>    
+      <button @click="validatePayload()">Guardar</button>
     </article>
   </section>
 </template>
@@ -46,22 +50,40 @@
   import { useAuthStore } from '@/stores/auth';
   import { ref } from 'vue';
 
-  function validatePhoneNumber(): void {
+  async function onSaveProfile(): Promise<void> {
+    console.log("OnSaveProfile: He entrado")
+  }
+
+  function validatePayload(): void {
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!regexEmail.test(email.value)) {
+      emailError.value = 'El formato del correo electrónico no es válido';
+
+    } else {
+      emailError.value = '';
+    }    
+
     if (telefono.value.length !== 9) {
-        error.value = 'El teléfono solo debe de tener 9 números';
-        disableSubmit.value = true;
-        return;
+      phoneError.value = 'El teléfono solo debe de tener 9 números';
     }
 
     for (const letter of telefono.value) {
       if ("abcdefghijklmnñopqrstuvwxyzáéíóú".includes(letter)) {
-        error.value = 'El teléfono solo debe de tener 9 números';
-        disableSubmit.value = true;
-        return;
+        phoneError.value = 'El teléfono solo debe de tener 9 números';
       }
     }
-    error.value = '';
-    disableSubmit.value = false;
+
+    if (phoneError.value !== '' || emailError.value !== '') {
+      return;
+    }
+
+    console.log("ValidatePayload: Todo bien")
+
+    phoneError.value = '';
+    emailError.value = '';
+    console.log("hola")
+    onSaveProfile()
   } 
 
   const authStore = useAuthStore();
@@ -71,7 +93,6 @@
   let email = ref<string>(user.value?.email ?? '');
   let telefono = ref<string>(user.value?.perfil.telefono ?? '');
 
-  let error = ref<string>('');
-  let disableSubmit = ref<boolean>(false);
-
+  let emailError = ref<string>('');
+  let phoneError = ref<string>('');
 </script>
