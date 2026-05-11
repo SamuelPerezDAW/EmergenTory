@@ -11,15 +11,21 @@ class ChecklistSerializer(BaseSerializer):
         data = {
             'id': instance.pk,
             'usuario': UserSerializer(instance.usuario).serialize() if instance.usuario else None,
-            'vehiculo': VehicleSerializer(instance.vehiculo).serialize(),
             'creado': instance.creado.isoformat(),
             'actualizado': instance.actualizado.isoformat(),
         }
 
+        # Para que no haya un loop infinito de relaciones entre Checklist y items/vehiculo
         if not self.fields or 'items' in self.fields:
             data['items'] = (
                 CheckitemSerializer(items, fields=['id', 'nombre', 'activo']).serialize(),
             )
+
+        if not self.fields or 'vehiculo' in self.fields:
+            data['vehiculo'] = VehicleSerializer(
+                instance.vehiculo,
+                fields=['id', 'matricula', 'imagen', 'marca', 'modelo', 'categoria'],
+            ).serialize()
 
         return data
 
@@ -34,7 +40,8 @@ class CheckitemSerializer(BaseSerializer):
 
         if not self.fields or 'checklist' in self.fields:
             data['checklist'] = ChecklistSerializer(
-                instance.checklist, fields=['id', 'vehiculo']
+                instance.checklist,
+                fields=['id', 'vehiculo'],
             ).serialize()
 
         return data

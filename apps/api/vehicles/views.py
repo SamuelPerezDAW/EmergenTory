@@ -1,10 +1,10 @@
 import json
 
+from checklists.serializers import ChecklistSerializer
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from shared.decorators import require_admin, require_http_methods
 from users.decorators import auth_required
 
@@ -20,6 +20,29 @@ def vehicle_list(request):
     marca = request.GET.get('marca')
     categoria = request.GET.get('categoria')
     vehicles = Vehicle.objects.all()
+    newVehicles = []
+
+    for vehicle in vehicles:
+        data = {
+            'pk': vehicle.pk,
+            'matricula': vehicle.matricula,
+            'imagen': vehicle.imagen,
+            'marca': vehicle.marca,
+            'modelo': vehicle.modelo,
+            'categoria': vehicle.categoria,
+        }
+
+        if not vehicle.checklist:
+            data['lista'] = ''
+
+        else:
+            data['lista'] = (
+                ChecklistSerializer(vehicle.checklist).serialize() if vehicle.checklist else '',
+            )
+
+        newVehicles.insert(0, data)
+
+    vehicles = newVehicles
 
     if matricula:
         vehicles = vehicles.filter(matricula=matricula)
