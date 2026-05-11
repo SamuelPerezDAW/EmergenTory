@@ -17,9 +17,9 @@ class ChecklistSerializer(BaseSerializer):
 
         # Para que no haya un loop infinito de relaciones entre Checklist y items/vehiculo
         if not self.fields or 'items' in self.fields:
-            data['items'] = (
-                CheckitemSerializer(items, fields=['id', 'nombre', 'activo']).serialize(),
-            )
+            data['items'] = CheckitemSerializer(
+                items, fields=['id', 'nombre', 'activo']
+            ).serialize()
 
         if not self.fields or 'vehiculo' in self.fields:
             data['vehiculo'] = VehicleSerializer(

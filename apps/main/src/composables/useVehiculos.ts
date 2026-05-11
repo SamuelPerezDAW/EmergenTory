@@ -30,7 +30,8 @@ export function useVehiculos() {
       totalActive += vehiculo.lista.reduce((totalLista, lis) =>
         totalLista += lis.items.filter((item) => item.activo).length
       , 0)
-    , 0));
+    , 0)
+  );
 
   onMounted(async () => {
     if (!vehiculos.value.length) {

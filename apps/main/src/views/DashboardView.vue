@@ -57,7 +57,10 @@
                 <p class="text-sm text-slate-500">{{ vehicle.categoria }}</p>
               </div>
               <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">
-                {{ vehicle.lista.items.filter((item) => item.activo).length }} activos
+                {{ vehicle.lista.reduce((totalActivos, lis) => 
+                  totalActivos += lis.items.filter((item) => item.activo).length
+                  , 0) 
+                }} activos
               </span>
             </div>
           </div>
@@ -77,6 +80,7 @@ import type { SessionSummary } from '@/types';
 const router = useRouter();
 const { vehiculos, activeItems } = useVehiculos();
 
+console.log("DashboardView: Estos son los vehiculos ", vehiculos)
 const featuredVehiculos = computed(() => vehiculos.value.slice(0, 2));
 const totalVehiculos = computed(() => vehiculos.value.length);
 const sessionSummary = reactive<SessionSummary>({
