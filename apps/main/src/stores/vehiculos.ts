@@ -14,6 +14,7 @@ export const useVehiculosStore = defineStore('vehiculos', () => {
     loading.value = true;
     try {
       vehiculos.value = await getVehiculos();
+
     } finally {
       loading.value = false;
     }

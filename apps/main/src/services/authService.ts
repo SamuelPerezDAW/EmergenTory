@@ -59,13 +59,13 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
             },
           },
         };
-      } else {
-        console.log(data)
-        return
       }
     } catch(error) {
-      console.log("ERROR: ", error)
+      console.log("ERROR: ", error);
     }
+    
+  } else {
+    console.error("ERROR: Error ", status, " al hacer la petición");
   }
 }
 

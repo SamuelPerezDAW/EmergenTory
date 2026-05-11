@@ -26,17 +26,18 @@ export function useVehiculos() {
   );
 
   const activeItems = computed(() =>
-    vehiculos.value.reduce(
-      (total, vehiculo) => total + vehiculo.lista.items.filter((item) => item.activo).length,
-      0,
-    ),
-  );
+    vehiculos.value.reduce((totalActive, vehiculo) => 
+      totalActive += vehiculo.lista.reduce((totalLista, lis) =>
+        totalLista += lis.items.filter((item) => item.activo).length
+      , 0)
+    , 0));
 
   onMounted(async () => {
     if (!vehiculos.value.length) {
       await vehiculosStore.fetchVehiculos();
     }
   });
+
 
   return {
     vehiculos,

@@ -7,21 +7,21 @@
         <p class="mt-1 text-sm text-slate-500">{{ vehicle.matricula }}</p>
       </div>
       <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-        {{ activeCount }}/{{ totalCount }} activos
+        {{ activeCount }}/{{ totalCount }} items activos
       </span>
     </div>
 
     <div class="mt-5 grid grid-cols-3 gap-3 text-center">
       <div class="rounded-2xl bg-slate-50 px-3 py-3">
-        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Lista</p>
-        <p class="mt-2 text-lg font-semibold text-slate-900">#{{ vehicle.lista.id }}</p>
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Última Lista</p>
+        <p class="mt-2 text-lg font-semibold text-slate-900">#{{ vehicle.lista[0].id }}</p>
       </div>
       <div class="rounded-2xl bg-slate-50 px-3 py-3">
-        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Items</p>
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Items Totales</p>
         <p class="mt-2 text-lg font-semibold text-slate-900">{{ totalCount }}</p>
       </div>
       <div class="rounded-2xl bg-slate-50 px-3 py-3">
-        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Inactivos</p>
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Items Inactivos Totales</p>
         <p class="mt-2 text-lg font-semibold text-amber-600">{{ inactiveCount }}</p>
       </div>
     </div>
@@ -58,7 +58,19 @@ defineEmits<{
   (event: 'manage-items', matricula: string): void;
 }>();
 
-const totalCount = computed(() => props.vehicle.lista.items.length);
-const activeCount = computed(() => props.vehicle.lista.items.filter((item) => item.activo).length);
+const totalCount = computed(() => {
+  let count = 0
+  props.vehicle.lista.forEach((checklist) => {
+    count += checklist.items.filter((item) => !item.activo).length
+  })
+  return count
+});
+const activeCount = computed(() => {
+  let count = 0
+  props.vehicle.lista.forEach((checklist) => {
+    count += checklist.items.filter((item) => item.activo).length
+  })
+  return count
+});
 const inactiveCount = computed(() => totalCount.value - activeCount.value);
 </script>

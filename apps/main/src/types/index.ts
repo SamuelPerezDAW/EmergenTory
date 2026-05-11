@@ -32,7 +32,7 @@ export interface Vehiculo {
   marca: string;
   modelo: string;
   categoria: string;
-  lista: Lista;
+  lista: Lista[];
 }
 
 export interface AuthPayload {
