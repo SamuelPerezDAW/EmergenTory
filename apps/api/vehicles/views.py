@@ -22,6 +22,18 @@ def vehicle_list(request):
     vehicles = Vehicle.objects.all()
     newVehicles = []
 
+    if matricula:
+        vehicles = vehicles.filter(matricula=matricula)
+
+    if modelo:
+        vehicles = vehicles.filter(modelo=modelo)
+
+    if marca:
+        vehicles = vehicles.filter(marca=marca)
+
+    if categoria:
+        vehicles = vehicles.filter(categoria=categoria)
+
     for vehicle in vehicles:
         data = {
             'pk': vehicle.pk,
@@ -43,18 +55,6 @@ def vehicle_list(request):
         newVehicles.insert(0, data)
 
     vehicles = newVehicles
-
-    if matricula:
-        vehicles = vehicles.filter(matricula=matricula)
-
-    if modelo:
-        vehicles = vehicles.filter(modelo=modelo)
-
-    if marca:
-        vehicles = vehicles.filter(marca=marca)
-
-    if categoria:
-        vehicles = vehicles.filter(categoria=categoria)
 
     serializer = VehicleSerializer(vehicles, request=request)
     return serializer.json_response()

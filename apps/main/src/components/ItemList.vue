@@ -16,6 +16,7 @@
       >
         <div class="flex items-center gap-3">
           <span
+            v-bind:title="item.activo ? 'Operativo' : 'Revisión pendiente'"
             class="inline-flex h-10 w-10 items-center cursor-pointer justify-center rounded-2xl text-2xl font-bold"
             :class="item.activo ? 'bg-emerald-100 hover:bg-emerald-200 hover:ring-emerald-200 text-emerald-700' : 'bg-amber-100 hover:bg-amber-200 hover:ring-amber-200 text-amber-700'"
             @click="$emit('changeItemStatus', item)"

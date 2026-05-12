@@ -30,7 +30,9 @@ export const useVehiculosStore = defineStore('vehiculos', () => {
     if (localVehicle) {
       return localVehicle;
     }
-    return getVehiculoByMatricula(matricula);
+
+    const newVehicle = await getVehiculoByMatricula(matricula)
+    return typeof newVehicle === 'object' && newVehicle?.length !== 0 ? newVehicle[0] : null;
   };
 
   const updateVehiculo = (nextVehiculo: Vehiculo) => {

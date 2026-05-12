@@ -1,6 +1,6 @@
 <template>
   <section v-if="vehiculo" class="space-y-6">
-    <article class="rounded-[2rem] bg-slate-900 p-6 text-white shadow-sm">
+    <article class="rounded-4xl bg-slate-900 p-6 text-white shadow-sm">
       <p class="text-xs uppercase tracking-[0.35em] text-brand-100">{{ vehiculo.categoria }}</p>
       <div class="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -14,7 +14,7 @@
     </article>
 
     <div class="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-      <article class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+      <article class="rounded-4xl border border-slate-200 bg-white p-5 shadow-sm">
         <p class="text-xs uppercase tracking-[0.35em] text-brand-600">Metadatos</p>
         <dl class="mt-5 space-y-4">
           <div class="rounded-2xl bg-slate-50 p-4">
@@ -32,7 +32,7 @@
         </dl>
       </article>
 
-      <ItemList title="Items del vehículo" :items="vehiculo.lista[0].items" @edit="openEditor" @remove="removeItem" />
+      <ItemList title="Items del vehículo" :items="vehiculo.lista[0].items" @edit="openEditor" @change-item-status="changeItemStatus" @remove="removeItem" />
     </div>
 
     <BaseModal :open="modalOpen" title="Editar item" eyebrow="Mantenimiento" @close="closeModal">
@@ -61,7 +61,6 @@ import ItemList from '@/components/ItemList.vue';
 import { useItemsStore } from '@/stores/items';
 import { useVehiculosStore } from '@/stores/vehiculos';
 import type { Item, Vehiculo } from '@/types';
-import { isAdmin } from '@/composables/useAuth';
 
 const route = useRoute();
 const vehiculosStore = useVehiculosStore();
@@ -98,6 +97,16 @@ const saveItem = async () => {
   await loadVehiculo();
   
   closeModal();
+};
+
+const changeItemStatus = async (item: { id: number; nombre: string; activo: boolean }) => {
+  if (!vehiculo.value) return;
+  await itemsStore.editItem(vehiculo.value.matricula, {
+    id: item.id,
+    nombre: item.nombre,
+    activo: !item.activo,
+  });
+  loadVehiculo();
 };
 
 const removeItem = async (itemId: number) => {

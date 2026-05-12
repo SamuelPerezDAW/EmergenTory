@@ -6,6 +6,8 @@
         <h2 class="mt-2 text-2xl font-semibold text-slate-900">Lista de vehículos</h2>
       </div>
 
+      
+
       <div class="grid gap-3 sm:grid-cols-2">
         <input
           v-model="filters.search"
