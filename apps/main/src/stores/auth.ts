@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { loginService, signupService } from '@/services/authService';
+import { loginService } from '@/services/authService';
 import type { AuthPayload, Usuario } from '@/types';
 
 const TOKEN_KEY = 'emergentory_token';
@@ -25,19 +25,12 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     try {
       const response = await loginService(payload);
+      if (!response) return null;
       persistSession(response.token, response.user);
+      
     } finally {
       loading.value = false;
-    }
-  };
-
-  const signup = async (payload: AuthPayload) => {
-    loading.value = true;
-    try {
-      const response = await signupService(payload);
-      persistSession(response.token, response.user);
-    } finally {
-      loading.value = false;
+      return true;
     }
   };
 
@@ -49,5 +42,5 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.removeItem('emergentory_session_summary');
   };
 
-  return { token, user, loading, isAuthenticated, fullName, login, signup, logout };
+  return { token, user, loading, isAuthenticated, fullName, login, logout };
 });

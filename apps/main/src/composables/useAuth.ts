@@ -11,18 +11,18 @@ export function useAuth() {
   const submitLogin = async (payload: AuthPayload) => {
     isSubmitting.value = true;
     try {
-      await authStore.login(payload);
-    } finally {
-      isSubmitting.value = false;
-    }
-  };
+      if ( await authStore.login(payload)) {
+        isSubmitting.value = false;
+        return true;
 
-  const submitSignup = async (payload: AuthPayload) => {
-    isSubmitting.value = true;
-    try {
-      await authStore.signup(payload);
-    } finally {
-      isSubmitting.value = false;
+      } else {
+        isSubmitting.value = false;
+        return null;
+      }
+
+    } catch (error) {
+      console.error('ERROR: ', error)
+      return null;
     }
   };
 
@@ -30,7 +30,6 @@ export function useAuth() {
     isAuthenticated,
     isSubmitting,
     submitLogin,
-    submitSignup,
     logout: authStore.logout,
   };
 }

@@ -29,7 +29,9 @@ class Profile(models.Model):
 
 class Token(models.Model):
     key = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
-    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL, related_name='token', on_delete=models.CASCADE
+    )
     creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

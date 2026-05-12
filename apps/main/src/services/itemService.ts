@@ -12,7 +12,7 @@ export async function createItemService(item: Item, matricula: string): Promise<
     'checklist': matricula,
   },{
     headers: {
-      "Authorization": "Bearer f5a7f855-28d9-4c63-91ad-f2381a4a6866"
+      "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`
     }
   });
 

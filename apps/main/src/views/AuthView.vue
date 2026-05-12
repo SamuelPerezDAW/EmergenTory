@@ -34,25 +34,10 @@
           eyebrow="Autenticación"
           @submit="handleSubmit"
         >
-          <div v-if="!isLogin" class="grid gap-4 sm:grid-cols-2">
-            <label class="space-y-2 text-sm font-medium text-slate-700">
-              <span>Nombre</span>
-              <input v-model="form.first_name" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-0 focus:border-brand-500" />
-            </label>
-            <label class="space-y-2 text-sm font-medium text-slate-700">
-              <span>Apellidos</span>
-              <input v-model="form.last_name" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-0 focus:border-brand-500" />
-            </label>
-          </div>
-
           <div class="grid gap-4">
             <label class="space-y-2 text-sm font-medium text-slate-700">
               <span>Usuario</span>
-              <input v-model="form.username" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-0 focus:border-brand-500" />
-            </label>
-            <label class="space-y-2 text-sm font-medium text-slate-700">
-              <span>Email</span>
-              <input v-model="form.email" type="email" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-0 focus:border-brand-500" />
+              <input v-model="form.username" type="text" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-0 focus:border-brand-500" />
             </label>
             <label class="space-y-2 text-sm font-medium text-slate-700">
               <span>Contraseña</span>
@@ -66,14 +51,7 @@
                 type="submit"
                 class="flex-1 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
               >
-                {{ isSubmitting ? 'Procesando...' : isLogin ? 'Entrar' : 'Crear cuenta' }}
-              </button>
-              <button
-                type="button"
-                class="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"
-                @click="isLogin = !isLogin"
-              >
-                {{ isLogin ? 'Ir a registro' : 'Volver al login' }}
+                {{ isSubmitting ? 'Procesando...' : 'Entrar' }}
               </button>
             </div>
           </template>
@@ -90,24 +68,17 @@ import BaseForm from '@/components/BaseForm.vue';
 import { useAuth } from '@/composables/useAuth';
 
 const router = useRouter();
-const { submitLogin, submitSignup, isSubmitting } = useAuth();
+const { submitLogin, isSubmitting } = useAuth();
 
 const isLogin = ref(true);
 const form = reactive({
-  username: 'coordinador112',
-  email: 'coordinador@emergentory.app',
-  password: '123456',
-  first_name: 'Lucia',
-  last_name: 'Medina',
+  username: '',
+  password: '',
 });
 
 const handleSubmit = async () => {
-  if (isLogin.value) {
-    await submitLogin(form);
-  } else {
-    await submitSignup(form);
+  if (await submitLogin(form)) {
+    await router.push('/dashboard');
   }
-
-  await router.push('/dashboard');
 };
 </script>
