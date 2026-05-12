@@ -112,80 +112,68 @@ def del_user(request, nombre_usuario):
 @auth_required
 def mod_profile(request, nombre_usuario):
     try:
-        payload = json.loads(request.body)
+        if request.content_type and request.content_type.startswith('multipart/form-data'):
+            payload = request.POST
+        else:
+            payload = json.loads(request.body)
+
         bearer_token = request.headers.get('Authorization', '')
         token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
 
         perfil_validar = Profile.objects.get(usuario=token.usuario)
         perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
-        mod_user = get_user_model().objects.filter(username=nombre_usuario)
-        mod_profile = Profile.objects.filter(usuario__username=nombre_usuario)
+        user = perfil_original.usuario
         data = {'actualizados': []}
+
+        def update_profile():
+            if 'nombre_usuario' in payload and payload['nombre_usuario'] != user.username:
+                if get_user_model().objects.filter(username=payload['nombre_usuario']).exclude(pk=user.pk):
+                    return JsonResponse({'error': 'El usuario ya existe'}, status=400)
+
+                user.username = payload['nombre_usuario']
+                data['actualizados'].append({'usuario': 'nombre_usuario'})
+
+            if 'nombre' in payload:
+                user.first_name = payload['nombre']
+                data['actualizados'].append({'usuario': 'nombre'})
+
+            if 'apellidos' in payload:
+                user.last_name = payload['apellidos']
+                data['actualizados'].append({'usuario': 'apellidos'})
+
+            if 'email' in payload:
+                user.email = payload['email']
+                data['actualizados'].append({'usuario': 'email'})
+
+            if 'contraseña' in payload:
+                user.password = payload['contraseña']
+                data['actualizados'].append({'usuario': 'contraseña'})
+
+            if 'bio' in payload:
+                perfil_original.bio = payload['bio']
+                data['actualizados'].append({'perfil': 'bio'})
+
+            if 'telefono' in payload:
+                perfil_original.telefono = payload['telefono'] or None
+                data['actualizados'].append({'perfil': 'telefono'})
+
+            if 'avatar' in request.FILES:
+                perfil_original.avatar = request.FILES['avatar']
+                data['actualizados'].append({'perfil': 'avatar'})
+
+            user.full_clean()
+            user.save()
+            perfil_original.full_clean()
+            perfil_original.save()
+
+            data['perfil'] = ProfileSerializer(perfil_original, request=request).serialize()
+            return JsonResponse(data)
+
 
         # En caso de que el usuario que está haciendo la petición tenga el rol de admin, se le permite hacerlo.
         # En caso contrario se comprueba que el usuario sea el propietario.
-        if Profile.objects.get(usuario=token.usuario).admin:
-            if 'nombre_usuario' in payload:
-                if get_user_model().objects.filter(username=payload['nombre_usuario']):
-                    return JsonResponse({'error': 'El usuario ya existe'}, status=400)
-
-                data['actualizados'] += {'id': mod_user.update(username=payload['nombre_usuario'])}
-
-            if 'nombre' in payload:
-                data['actualizados'] += {'id': mod_user.update(first_name=payload['nombre'])}
-
-            if 'apellidos' in payload:
-                data['actualizados'] += {'id': mod_user.update(last_name=payload['apellidos'])}
-
-            if 'email' in payload:
-                data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
-
-            if 'contraseña' in payload:
-                data['actualizados'] += {'id': mod_user.update(password=payload['contraseña'])}
-
-            if 'bio' in payload:
-                data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
-
-            if 'avatar' in payload:
-                data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
-
-            if 'telefono' in payload:
-                profile_phone = mod_profile.first()
-                profile_phone.telefono = payload['telefono']
-                profile_phone.full_clean()
-                profile_phone.save()
-                data['actualizados'] += {'id': mod_profile.first().pk}
-
-        elif perfil_original == perfil_validar:
-            if 'nombre_usuario' in payload:
-                if get_user_model().objects.filter(username=payload['nombre_usuario']):
-                    return JsonResponse({'error': 'El usuario ya existe'}, status=400)
-
-                data['actualizados'] += {'id': mod_user.update(username=payload['nombre_usuario'])}
-
-            if 'nombre' in payload:
-                data['actualizados'] += {'id': mod_user.update(first_name=payload['nombre'])}
-
-            if 'apellidos' in payload:
-                data['actualizados'] += {'id': mod_user.update(last_name=payload['apellidos'])}
-
-            if 'email' in payload:
-                data['actualizados'] += {'id': mod_user.update(email=payload['email'])}
-
-            if 'contraseña' in payload:
-                data['actualizados'] += {'id': mod_user.update(password=payload['contraseña'])}
-
-            if 'bio' in payload:
-                data['actualizados'] += {'id': mod_profile.update(bio=payload['bio'])}
-
-            if 'avatar' in payload:
-                data['actualizados'] += {'id': mod_profile.update(avatar=payload['avatar'])}
-
-            if 'telefono' in payload:
-                mod_profile.first().telefono = payload['telefono']
-                mod_profile.first().full_clean()
-                mod_profile.first().save()
-                data['actualizados'] += {'id': mod_profile.first().pk}
+        if Profile.objects.get(usuario=token.usuario).admin or perfil_original == perfil_validar:
+            return update_profile()
 
         else:
             return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)

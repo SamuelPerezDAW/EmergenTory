@@ -1,5 +1,4 @@
 import type { AuthPayload, Usuario } from '@/types';
-import { mockUser } from './mockData';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
@@ -21,6 +20,21 @@ export function convertPassword(password: string, hashedPassword: string) {
 
 const wait = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function mapProfileResponse(data: any): Usuario {
+  return {
+    id: data.usuario.id,
+    username: data.usuario.nombre_usuario,
+    email: data.usuario.email,
+    first_name: data.usuario.nombre,
+    last_name: data.usuario.apellido,
+    perfil: {
+      admin: data.admin,
+      avatar: data.avatar,
+      bio: data.bio,
+      telefono: data.telefono ?? '',
+    },
+  };
+}
 
 export async function loginService(payload: AuthPayload): Promise<{ token: string; user: Usuario } | undefined | null> {
   await wait();
@@ -40,19 +54,7 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
       ){
         return {
           token: data.token.key,
-          user: {
-            id: data.usuario.id,
-            username: data.usuario.nombre_usuario,
-            email: data.usuario.email,
-            first_name: data.usuario.nombre,
-            last_name: data.usuario.apellido,
-            perfil: {
-              admin: data.admin,
-              avatar: data.avatar,
-              bio: data.bio,
-              telefono: data.telefono,
-            },
-          },
+          user: mapProfileResponse(data),
         };
       }
     } catch(error) {
@@ -61,5 +63,19 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
     
   } else {
     console.error("ERROR: Error ", status, " al hacer la petición");
+  }
+}
+
+export async function updateProfileService(username: string, payload: FormData): Promise<Usuario | undefined> {
+  await wait();
+
+  const response = await axios.post(`http://127.0.0.1:8000/api/users/profile/${username}/mod/`, payload, {
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
+    },
+  });
+
+  if (response.status === 200 && response.data?.perfil) {
+    return mapProfileResponse(response.data.perfil);
   }
 }

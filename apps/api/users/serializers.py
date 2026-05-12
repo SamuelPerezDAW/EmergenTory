@@ -35,7 +35,7 @@ class ProfileSerializer(BaseSerializer):
         return {
             'id': instance.pk,
             'avatar': self.build_url(instance.avatar.url),
-            'bio': instance.pk,
+            'bio': instance.bio,
             'telefono': instance.telefono,
             'admin': instance.admin,
             'usuario': UserSerializer(instance.usuario).serialize(),
