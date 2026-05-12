@@ -64,7 +64,30 @@ export async function updateItemService(item: Item, matricula: string): Promise<
   }
 }
 
-export async function deleteItemService(itemId: number): Promise<number> {
+export async function deleteItemService(itemId: number): Promise<number | undefined> {
   await wait();
-  return itemId;
+
+  const response = await axios.post(`http://127.0.0.1:8000/api/checklists/checkitems/del/`, {
+    'id': itemId,
+  }, {
+    headers: {
+      "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`
+    }
+  });
+
+  const status = response.status;
+  const data = response.data;
+  
+  if (status == 200){  
+    try {
+      if (typeof data === 'object'){
+        return data['id'];
+      }
+    } catch(error) {
+      console.log("ERROR: ", error);
+    }
+    
+  } else {
+    console.error("ERROR: Error ", status, " al hacer la petición");
+  }
 }

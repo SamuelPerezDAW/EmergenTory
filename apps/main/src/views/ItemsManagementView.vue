@@ -57,7 +57,7 @@ const selectedMatricula = ref(sessionStorage.getItem('selected_vehicle') || '');
 const editingId = ref<number | null>(null);
 const form = reactive({
   nombre: '',
-  activo: true,
+  activo: false,
 });
 
 const currentVehiculo = computed(
@@ -74,7 +74,7 @@ watch(selectedMatricula, (value) => {
 const resetForm = () => {
   editingId.value = null;
   form.nombre = '';
-  form.activo = true;
+  form.activo = false;
 };
 
 const handleSubmit = async () => {
@@ -95,6 +95,7 @@ const handleSubmit = async () => {
   }
 
   resetForm();
+  fetchVehiculos();
 };
 
 const startEdit = (item: { id: number; nombre: string; activo: boolean }) => {
@@ -105,15 +106,20 @@ const startEdit = (item: { id: number; nombre: string; activo: boolean }) => {
 
 const removeItem = async (itemId: number) => {
   if (!selectedMatricula.value) return;
-  await itemsStore.removeItem(selectedMatricula.value, itemId);
+  await itemsStore.removeItem(selectedMatricula.value, itemId)
   if (editingId.value === itemId) {
     resetForm();
   }
+  fetchVehiculos();
+};
+
+const fetchVehiculos = async () => {
+  await vehiculosStore.fetchVehiculos();
 };
 
 onMounted(async () => {
   if (!vehiculosStore.vehiculos.length) {
-    await vehiculosStore.fetchVehiculos();
+    await fetchVehiculos();
   }
 
   if (!selectedMatricula.value && vehiculosStore.vehiculos.length) {

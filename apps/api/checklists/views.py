@@ -66,6 +66,9 @@ def add_item(request):
         if 'nombre' not in payload:
             return JsonResponse({'error': 'Falta el campo nombre'}, status=400)
 
+        elif not isinstance(payload['nombre'], str):
+            return JsonResponse({'error': 'Nombre solo puede ser una cadena de texto'}, status=400)
+
         elif len(payload['nombre']) > 255:
             return JsonResponse(
                 {'error': 'Nombre solo puede tener hasta 255 carácteres'}, status=400
@@ -84,11 +87,14 @@ def add_item(request):
 
         checklist = Checklist.objects.get(vehiculo__matricula=payload['checklist'])
 
-        checkitem = Checkitem.objects.create(
+        Checkitem.objects.create(
             nombre=payload['nombre'],
             activo=payload['activo'],
             checklist=checklist,
         )
+        checkitem = Checkitem.objects.filter(
+            nombre=payload['nombre'], activo=payload['activo'], checklist=checklist
+        ).order_by('-pk')
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Json inválido'}, status=400)
@@ -96,7 +102,7 @@ def add_item(request):
     except Checklist.DoesNotExist:
         return JsonResponse({'error': 'La lista no existe'}, status=404)
 
-    return JsonResponse({'id': checkitem.pk})
+    return JsonResponse({'id': checkitem[0].pk})
 
 
 @csrf_exempt
@@ -107,8 +113,17 @@ def mod_item(request):
     try:
         payload = json.loads(request.body)
 
+        if 'id' not in payload:
+            return JsonResponse({'error': 'Falta el campo id'}, status=400)
+
+        elif not isinstance(payload['id'], int):
+            return JsonResponse({'error': 'Id solo puede ser un número'}, status=400)
+
         if 'nombre' not in payload:
             return JsonResponse({'error': 'Falta el campo nombre'}, status=400)
+
+        elif not isinstance(payload['nombre'], str):
+            return JsonResponse({'error': 'Nombre solo puede ser una cadena de texto'}, status=400)
 
         elif len(payload['nombre']) > 255:
             return JsonResponse(
@@ -154,19 +169,24 @@ def mod_item(request):
 @require_http_methods('POST')
 @auth_required
 @require_admin
-def del_item(request, matricula, nombre_item):
+def del_item(request):
     try:
-        checklist = Checklist.objects.get(vehiculo__matricula=matricula)
-        Checkitem.objects.get(nombre=nombre_item, checklist__vehiculo__matricula=checklist)
+        payload = json.loads(request.body)
 
-        item = Checkitem.objects.filter(
-            nombre=nombre_item, checklist__vehiculo__matricula=checklist
-        ).delete()
+        if 'id' not in payload:
+            return JsonResponse({'error': 'Falta el campo id'}, status=400)
+
+        elif not isinstance(payload['id'], int):
+            return JsonResponse({'error': 'Id solo puede ser un número'}, status=400)
+
+        item = Checkitem.objects.get(pk=payload['id'])
+
+        item.delete()
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Json inválido'}, status=400)
 
     except Checkitem.DoesNotExist:
         return JsonResponse({'error': 'Item no encontrado'}, status=404)
 
-    except Checklist.DoesNotExist:
-        return JsonResponse({'error': 'Lista no encontrada'}, status=404)
-
-    return JsonResponse({'id': item})
+    return JsonResponse({'id': item.pk})

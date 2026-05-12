@@ -18,8 +18,7 @@ export const useItemsStore = defineStore('items', () => {
       const created = await createItemService(item, matricula);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
       if (!vehiculo || !created) return;
-      vehiculo.lista[0].items.push(created);
-      vehiculosStore.updateVehiculo({ ...vehiculo });
+      
     } finally {
       saving.value = false;
     }
@@ -31,8 +30,7 @@ export const useItemsStore = defineStore('items', () => {
       const updated = await updateItemService(item, matricula);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
       if (!vehiculo || !updated) return;
-      vehiculo.lista[0].items = vehiculo.lista[0].items.map((entry) => (entry.id === updated.id ? updated : entry));
-      vehiculosStore.updateVehiculo({ ...vehiculo });
+
     } finally {
       saving.value = false;
     }
@@ -43,9 +41,8 @@ export const useItemsStore = defineStore('items', () => {
     try {
       const deletedId = await deleteItemService(itemId);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
-      if (!vehiculo) return;
-      vehiculo.lista[0].items = vehiculo.lista[0].items.filter((entry) => entry.id !== deletedId);
-      vehiculosStore.updateVehiculo({ ...vehiculo });
+      if (!vehiculo || !deletedId) return;
+
     } finally {
       saving.value = false;
     }
