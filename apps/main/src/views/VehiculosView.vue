@@ -39,6 +39,7 @@
         :vehicle="vehicle"
         @select="handleSelect"
         @manage-items="handleManageItems"
+        @remove="removeVehicle"
       />
     </div>
     <BaseModal :open="modalOpen" title="Crear Vehiculo" eyebrow="Gestión" @close="closeModal">
@@ -109,6 +110,11 @@ const closeModal = async () => {
 
 const saveVehicle = async () => {
   await vehicleStore.saveVehiculo(vehicleToCreate);
+  modalOpen.value = false;
+}
+
+const removeVehicle = async (matricula: string) => {
+  await vehicleStore.deleteVehiculo(matricula);
   modalOpen.value = false;
 }
 

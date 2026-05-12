@@ -79,3 +79,23 @@ export async function createVehiculo(vehiculo: Vehiculo): Promise<Vehiculo[] | u
     return [] as Vehiculo[];
   }
 }
+
+export async function removeVehiculo(matricula: string): Promise<void> {
+  await wait(200);
+
+  const response = await axios.post(`http://127.0.0.1:8000/api/vehicles/${matricula}/del/`, { }, {
+    headers: {
+      "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
+    },
+  });
+
+  const status: number = response.status;
+  const data: any[] = response.data;
+
+  if (status == 200) {
+    
+    
+  } else {
+    console.error("ERROR: Error ", status, " al hacer la petición");
+  }
+}

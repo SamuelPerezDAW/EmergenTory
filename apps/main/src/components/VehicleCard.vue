@@ -46,6 +46,14 @@
       >
         Gestionar items
       </button>
+      <button
+        v-if="isAdmin"
+        type="button"
+        class="rounded-xl border border-1 border-rose-50 bg-rose-50 hover:bg-rose-100 hover:border-rose-200 px-4 py-3 cursor-pointer text-sm font-medium text-rose-700"
+        @click="$emit('remove', vehicle.matricula)"
+      >
+        Eliminar
+      </button>
     </div>
   </article>
 </template>
@@ -54,6 +62,7 @@
 import { computed } from 'vue';
 import type { Vehiculo } from '@/types';
 import { useVehiculos } from '@/composables/useVehiculos';
+import { isAdmin } from '@/composables/useAuth';
 
 const { categorias } = useVehiculos();
 
@@ -64,6 +73,7 @@ const props = defineProps<{
 defineEmits<{
   (event: 'select', matricula: string): void;
   (event: 'manage-items', matricula: string): void;
+  (event: 'remove', matricula: string): void;
 }>();
 
 const totalCount = computed(() => {

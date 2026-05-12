@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getVehiculoByMatricula, getVehiculos, createVehiculo} from '@/services/vehiculoService';
+import { getVehiculoByMatricula, getVehiculos, createVehiculo, removeVehiculo} from '@/services/vehiculoService';
 import type { Vehiculo } from '@/types';
 
 export const useVehiculosStore = defineStore('vehiculos', () => {
@@ -58,5 +58,19 @@ export const useVehiculosStore = defineStore('vehiculos', () => {
     );
   };
 
-  return { vehiculos, loading, selectedMatricula, totalVehiculos, fetchVehiculos, fetchVehiculo, selectVehiculo, saveVehiculo, updateVehiculo };
+  const deleteVehiculo = async (matricula: string) => {
+    loading.value = true;
+    try {
+      await removeVehiculo(matricula);
+      await fetchVehiculos();
+
+    } catch (error) {
+      console.error("ERROR: ", error);
+
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { vehiculos, loading, selectedMatricula, totalVehiculos, fetchVehiculos, fetchVehiculo, selectVehiculo, saveVehiculo, updateVehiculo, deleteVehiculo };
 });
