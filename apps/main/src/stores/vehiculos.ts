@@ -58,5 +58,5 @@ export const useVehiculosStore = defineStore('vehiculos', () => {
     );
   };
 
-  return { vehiculos, loading, selectedMatricula, totalVehiculos, fetchVehiculos, fetchVehiculo, selectVehiculo, updateVehiculo };
+  return { vehiculos, loading, selectedMatricula, totalVehiculos, fetchVehiculos, fetchVehiculo, selectVehiculo, saveVehiculo, updateVehiculo };
 });

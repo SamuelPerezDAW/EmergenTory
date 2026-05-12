@@ -81,9 +81,11 @@ import { isAdmin } from '@/composables/useAuth';
 import BaseModal from '@/components/BaseModal.vue';
 import { reactive, ref } from 'vue';
 import { Vehiculo } from '@/types';
+import { useVehiculosStore } from '@/stores/vehiculos';
 
 const router = useRouter();
 const { loading, filters, categorias, filteredVehiculos, selectVehiculo } = useVehiculos();
+const vehicleStore = useVehiculosStore();
 const modalOpen = ref<boolean>(false);
 
 let vehicleToCreate = reactive<Vehiculo>({
@@ -105,8 +107,9 @@ const closeModal = async () => {
   }
 };
 
-const saveVehicle = () => {
-  
+const saveVehicle = async () => {
+  await vehicleStore.saveVehiculo(vehicleToCreate);
+  modalOpen.value = false;
 }
 
 const handleSelect = async (matricula: string) => {

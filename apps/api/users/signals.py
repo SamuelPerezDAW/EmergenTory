@@ -19,4 +19,4 @@ def create_user_token(sender, instance, created, raw, using, update_fields, **kw
 
 @receiver(pre_save, sender=Profile)
 def phone_number_validation(sender, instance, raw, using, update_fields, **kwargs):
-    print(1)
+    return

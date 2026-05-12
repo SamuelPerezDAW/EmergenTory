@@ -1,5 +1,4 @@
 import type { Vehiculo } from '@/types';
-import { mockVehiculos } from './mockData';
 import axios from 'axios';
 
 const wait = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -54,7 +53,10 @@ export async function createVehiculo(vehiculo: Vehiculo): Promise<Vehiculo[] | u
   await wait(200);
 
   const response = await axios.post(`http://127.0.0.1:8000/api/vehicles/add/`, {
-    vehiculo
+    'matricula': vehiculo.matricula,
+    'marca': vehiculo.marca,
+    'modelo': vehiculo.modelo,
+    'categoria': vehiculo.categoria,
   }, {
     headers: {
       "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
