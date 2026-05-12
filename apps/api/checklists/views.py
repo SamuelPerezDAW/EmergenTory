@@ -2,7 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from shared.decorators import require_admin, require_http_methods
+from shared.decorators import require_http_methods
 from users.decorators import auth_required
 
 from .models import Checkitem, Checklist
@@ -58,7 +58,6 @@ def checkitems_list(request):
 @csrf_exempt
 @require_http_methods('POST')
 @auth_required
-@require_admin
 def add_item(request):
     try:
         payload = json.loads(request.body)
@@ -108,7 +107,6 @@ def add_item(request):
 @csrf_exempt
 @require_http_methods('POST')
 @auth_required
-@require_admin
 def mod_item(request):
     try:
         payload = json.loads(request.body)
@@ -168,7 +166,6 @@ def mod_item(request):
 @csrf_exempt
 @require_http_methods('POST')
 @auth_required
-@require_admin
 def del_item(request):
     try:
         payload = json.loads(request.body)
