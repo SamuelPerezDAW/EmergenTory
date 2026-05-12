@@ -21,6 +21,11 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.setItem(USER_KEY, JSON.stringify(nextUser));
   };
 
+  const updateUser = (nextUser: Usuario) => {
+    user.value = nextUser;
+    sessionStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+  };
+
   const login = async (payload: AuthPayload) => {
     loading.value = true;
     try {
@@ -42,5 +47,5 @@ export const useAuthStore = defineStore('auth', () => {
     sessionStorage.removeItem('emergentory_session_summary');
   };
 
-  return { token, user, loading, isAuthenticated, fullName, login, logout };
+  return { token, user, loading, isAuthenticated, fullName, login, logout, updateUser };
 });
