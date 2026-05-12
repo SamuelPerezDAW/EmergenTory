@@ -11,7 +11,20 @@ export function useVehiculos() {
     categoria: 'Todas',
   });
 
-  const categorias = computed(() => ['Todas', ...new Set(vehiculos.value.map((vehiculo) => vehiculo.categoria))]);
+  const categorias: {'clave': string, 'valor': string}[] = [
+    {
+      "clave": 'BOM',
+      "valor": 'Bomberos'
+    },
+    {
+      "clave": 'POL',
+      "valor": 'Policias'
+    },
+    {
+      "clave": 'AMB',
+      "valor": 'Ambulancias'
+    },
+  ];  
   const selectedVehicleCount = ref(0);
 
   const filteredVehiculos = computed(() =>
@@ -38,7 +51,6 @@ export function useVehiculos() {
       await vehiculosStore.fetchVehiculos();
     }
   });
-
 
   return {
     vehiculos,

@@ -6,7 +6,7 @@
           <p class="text-xs font-semibold uppercase tracking-[0.35em] text-brand-600">{{ eyebrow }}</p>
           <h3 class="mt-2 text-2xl font-semibold text-slate-900">{{ title }}</h3>
         </div>
-        <button type="button" class="rounded-2xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600" @click="$emit('close')">
+        <button type="button" class="rounded-2xl cursor-pointer bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600" @click="$emit('close')">
           Cerrar
         </button>
       </div>

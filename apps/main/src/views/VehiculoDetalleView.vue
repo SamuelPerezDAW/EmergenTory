@@ -41,11 +41,11 @@
           <span>Nombre del item</span>
           <input v-model="editableItem.nombre" class="w-full rounded-2xl border border-slate-200 px-4 py-3" />
         </label>
-        <label class="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+        <label class="flex items-center gap-3 cursor-pointer rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
           <input v-model="editableItem.activo" type="checkbox" />
           Item activo
         </label>
-        <button type="button" class="w-full rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white" @click="saveItem">
+        <button type="button" class="w-full cursor-pointer rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white" @click="saveItem">
           Guardar cambios
         </button>
       </div>
