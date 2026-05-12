@@ -9,16 +9,16 @@ export const useItemsStore = defineStore('items', () => {
   const vehiculosStore = useVehiculosStore();
 
   const totalItems = computed(() =>
-    vehiculosStore.vehiculos.reduce((total, vehiculo) => total + vehiculo.lista.items.length, 0),
+    vehiculosStore.vehiculos.reduce((total, vehiculo) => total + vehiculo.lista[0].items.length, 0),
   );
 
   const addItem = async (matricula: string, item: Item) => {
     saving.value = true;
     try {
-      const created = await createItemService(item);
+      const created = await createItemService(item, matricula);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
-      if (!vehiculo) return;
-      vehiculo.lista.items.push(created);
+      if (!vehiculo || !created) return;
+      vehiculo.lista[0].items.push(created);
       vehiculosStore.updateVehiculo({ ...vehiculo });
     } finally {
       saving.value = false;
@@ -31,7 +31,7 @@ export const useItemsStore = defineStore('items', () => {
       const updated = await updateItemService(item);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
       if (!vehiculo) return;
-      vehiculo.lista.items = vehiculo.lista.items.map((entry) => (entry.id === updated.id ? updated : entry));
+      vehiculo.lista[0].items = vehiculo.lista[0].items.map((entry) => (entry.id === updated.id ? updated : entry));
       vehiculosStore.updateVehiculo({ ...vehiculo });
     } finally {
       saving.value = false;
@@ -44,7 +44,7 @@ export const useItemsStore = defineStore('items', () => {
       const deletedId = await deleteItemService(itemId);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
       if (!vehiculo) return;
-      vehiculo.lista.items = vehiculo.lista.items.filter((entry) => entry.id !== deletedId);
+      vehiculo.lista[0].items = vehiculo.lista[0].items.filter((entry) => entry.id !== deletedId);
       vehiculosStore.updateVehiculo({ ...vehiculo });
     } finally {
       saving.value = false;

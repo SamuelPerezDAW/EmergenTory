@@ -63,7 +63,7 @@ const form = reactive({
 const currentVehiculo = computed(
   () => vehiculosStore.vehiculos.find((vehiculo) => vehiculo.matricula === selectedMatricula.value) ?? null,
 );
-const currentItems = computed(() => currentVehiculo.value?.lista.items ?? []);
+const currentItems = computed(() => currentVehiculo.value?.lista[0].items ?? []);
 
 watch(selectedMatricula, (value) => {
   if (value) {

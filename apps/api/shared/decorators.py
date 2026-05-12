@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from django.http import JsonResponse
-
 from users.models import Profile, Token
 
 
