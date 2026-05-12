@@ -19,20 +19,20 @@
         <dl class="mt-5 space-y-4">
           <div class="rounded-2xl bg-slate-50 p-4">
             <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Lista</dt>
-            <dd class="mt-2 text-lg font-semibold text-slate-900">#{{ vehiculo.lista.id }}</dd>
+            <dd class="mt-2 text-lg font-semibold text-slate-900">#{{ vehiculo.lista[0].id }}</dd>
           </div>
           <div class="rounded-2xl bg-slate-50 p-4">
             <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Creado</dt>
-            <dd class="mt-2 text-lg font-semibold text-slate-900">{{ formatDate(vehiculo.lista.creado) }}</dd>
+            <dd class="mt-2 text-lg font-semibold text-slate-900">{{ formatDate(vehiculo.lista[0].creado) }}</dd>
           </div>
           <div class="rounded-2xl bg-slate-50 p-4">
             <dt class="text-xs uppercase tracking-[0.2em] text-slate-500">Actualizado</dt>
-            <dd class="mt-2 text-lg font-semibold text-slate-900">{{ formatDate(vehiculo.lista.actualizado) }}</dd>
+            <dd class="mt-2 text-lg font-semibold text-slate-900">{{ formatDate(vehiculo.lista[0].actualizado) }}</dd>
           </div>
         </dl>
       </article>
 
-      <ItemList title="Items del vehículo" :items="vehiculo.lista.items" @edit="openEditor" @remove="removeItem" />
+      <ItemList title="Items del vehículo" :items="vehiculo.lista[0].items" @edit="openEditor" @remove="removeItem" />
     </div>
 
     <BaseModal :open="modalOpen" title="Editar item" eyebrow="Mantenimiento" @close="closeModal">

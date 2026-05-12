@@ -65,6 +65,7 @@ const totalCount = computed(() => {
   })
   return count
 });
+
 const activeCount = computed(() => {
   let count = 0
   props.vehicle.lista.forEach((checklist) => {
@@ -72,5 +73,6 @@ const activeCount = computed(() => {
   })
   return count
 });
+
 const inactiveCount = computed(() => totalCount.value - activeCount.value);
 </script>
