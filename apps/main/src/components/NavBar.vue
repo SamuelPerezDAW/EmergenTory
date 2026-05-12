@@ -15,18 +15,23 @@
           Menú
         </button>
 
-        <div class="hidden rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 sm:flex sm:items-center sm:gap-3">
+        <RouterLink
+          :key="'/perfil'"
+          :to="'/perfil'"
+          v-bind:title="user?.email"
+          class="hidden cursor-pointer hover:bg-slate-100 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 sm:flex sm:items-center sm:gap-3"
+        >
           <img
             v-if="user?.perfil.avatar"
             :src="user.perfil.avatar"
             :alt="user.username"
-            class="h-10 w-10 rounded-xl object-cover"
+            class="h-10 w-10 rounded-3xl object-cover border border-slate-200 bg-black/40" 
           />
           <div class="text-right">
             <p class="text-sm font-semibold text-slate-900">{{ fullName }}</p>
             <p class="text-xs text-slate-500">{{ user?.email }}</p>
           </div>
-        </div>
+        </RouterLink>
       </div>
     </div>
   </header>
@@ -34,6 +39,7 @@
 
 <script setup lang="ts">
 import type { Usuario } from '@/types';
+import { RouterLink } from 'vue-router';
 
 defineProps<{
   pageTitle: string;
