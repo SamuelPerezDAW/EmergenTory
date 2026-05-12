@@ -28,9 +28,9 @@ export const useItemsStore = defineStore('items', () => {
   const editItem = async (matricula: string, item: Item) => {
     saving.value = true;
     try {
-      const updated = await updateItemService(item);
+      const updated = await updateItemService(item, matricula);
       const vehiculo = vehiculosStore.vehiculos.find((entry) => entry.matricula === matricula);
-      if (!vehiculo) return;
+      if (!vehiculo || !updated) return;
       vehiculo.lista[0].items = vehiculo.lista[0].items.map((entry) => (entry.id === updated.id ? updated : entry));
       vehiculosStore.updateVehiculo({ ...vehiculo });
     } finally {

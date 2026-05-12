@@ -1,9 +1,7 @@
 import json
 
-from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from shared.decorators import require_admin, require_http_methods
 from users.decorators import auth_required
 
@@ -84,11 +82,6 @@ def add_item(request):
                 {'error': 'El campo checklist no contiene una matricula'}, status=400
             )
 
-        if Checkitem.objects.filter(
-            nombre=payload['nombre'], checklist__vehiculo__matricula=payload['checklist']
-        ):
-            raise IntegrityError()
-
         checklist = Checklist.objects.get(vehiculo__matricula=payload['checklist'])
 
         checkitem = Checkitem.objects.create(
@@ -100,9 +93,6 @@ def add_item(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Json inválido'}, status=400)
 
-    except IntegrityError:
-        return JsonResponse({'error': 'El item para esa lista ya existe'}, status=400)
-
     except Checklist.DoesNotExist:
         return JsonResponse({'error': 'La lista no existe'}, status=404)
 
@@ -113,10 +103,17 @@ def add_item(request):
 @require_http_methods('POST')
 @auth_required
 @require_admin
-def mod_item(request, matricula, nombre_item):
+def mod_item(request):
     try:
         payload = json.loads(request.body)
-        checklist = Checklist.objects.get(vehiculo__matricula=matricula)
+
+        if 'nombre' not in payload:
+            return JsonResponse({'error': 'Falta el campo nombre'}, status=400)
+
+        elif len(payload['nombre']) > 255:
+            return JsonResponse(
+                {'error': 'Nombre solo puede tener hasta 255 carácteres'}, status=400
+            )
 
         if 'activo' not in payload:
             return JsonResponse({'error': 'Falta el campo activo'}, status=400)
@@ -124,13 +121,22 @@ def mod_item(request, matricula, nombre_item):
         if not isinstance(payload['activo'], bool):
             raise json.JSONDecodeError('', '', 0)
 
-        Checkitem.objects.filter(
-            nombre=nombre_item, checklist__vehiculo__matricula=checklist
-        ).update(
+        if 'checklist' not in payload:
+            return JsonResponse(
+                {'error': 'El campo checklist no contiene una matricula'}, status=400
+            )
+
+        Checklist.objects.get(vehiculo__matricula=payload['checklist'])
+
+        item = Checkitem.objects.filter(pk=payload['id'])
+
+        if len(item) == 0:
+            raise Checkitem.DoesNotExist
+
+        item.update(
+            nombre=payload['nombre'],
             activo=payload['activo'],
         )
-
-        item = Checkitem.objects.get(nombre=nombre_item, checklist__vehiculo__matricula=checklist)
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Json inválido'}, status=400)
@@ -141,7 +147,7 @@ def mod_item(request, matricula, nombre_item):
     except Checklist.DoesNotExist:
         return JsonResponse({'error': 'Lista no encontrada'}, status=404)
 
-    return JsonResponse({'id': item.pk, 'nombre': item.nombre, 'activo': item.activo})
+    return JsonResponse({'id': item[0].pk, 'nombre': item[0].nombre, 'activo': item[0].activo})
 
 
 @csrf_exempt
