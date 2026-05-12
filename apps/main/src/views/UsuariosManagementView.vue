@@ -31,7 +31,15 @@
             <tr v-for="usuario in usuarios" :key="usuario.id" class="align-top">
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
-                  <img :src="usuario.perfil.avatar" :alt="usuario.username" class="h-11 w-11 rounded-2xl border border-slate-200 object-cover" />
+                  <img
+                    v-if="hasCustomAvatar(usuario)"
+                    :src="usuario.perfil.avatar"
+                    :alt="usuario.username"
+                    class="h-11 w-11 rounded-2xl border border-slate-200 object-cover"
+                  />
+                  <div v-else class="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold uppercase text-white">
+                    {{ getInitials(usuario) }}
+                  </div>
                   <div>
                     <p class="font-semibold text-slate-900">{{ usuario.first_name }} {{ usuario.last_name }}</p>
                     <p class="text-sm text-slate-500">{{ usuario.username }}</p>
@@ -197,6 +205,22 @@ function openEditModal(usuario: Usuario): void {
 function closeModal(): void {
   if (saving.value) return;
   modalOpen.value = false;
+}
+
+function hasCustomAvatar(usuario: Usuario): boolean {
+  return Boolean(usuario.perfil.avatar) && !usuario.perfil.avatar.includes('noavatar.png');
+}
+
+function getInitials(usuario: Usuario): string {
+  const nameParts = [usuario.first_name, usuario.last_name].filter(Boolean);
+  const source = nameParts.length ? nameParts.join(' ') : usuario.username;
+
+  return source
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('');
 }
 
 async function fetchUsers(): Promise<void> {
