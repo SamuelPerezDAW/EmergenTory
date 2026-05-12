@@ -11,9 +11,9 @@
         <span>Vehículo</span>
         <select
           v-model="selectedMatricula"
-          class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500"
+          class="w-full rounded-2xl cursor-pointer border border-slate-200 px-4 py-3 outline-none focus:border-brand-500"
         >
-          <option v-for="vehicle in vehiculosStore.vehiculos" :key="vehicle.matricula" :value="vehicle.matricula">
+          <option v-for="vehicle in vehiculosStore.vehiculos" :key="vehicle.matricula" :value="vehicle.matricula" class="cursor-pointer">
             {{ vehicle.matricula }} · {{ vehicle.marca }} {{ vehicle.modelo }}
           </option>
         </select>
@@ -21,25 +21,43 @@
 
       <label class="space-y-2 text-sm font-medium text-slate-700">
         <span>Nombre del item</span>
-        <input v-model="form.nombre" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500" />
+        <input v-model="form.nombre" placeholder="Introduce el nombre del item..." class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500 placeholder-slate-700/50" />
       </label>
 
-      <label class="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+      <label class="flex items-center gap-3 cursor-pointer rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
         <input v-model="form.activo" type="checkbox" />
         Item operativo
       </label>
 
       <template #actions>
-        <button
-          type="submit"
-          class="w-full rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
-        >
-          {{ editingId ? 'Actualizar item' : 'Crear item' }}
-        </button>
+        <span class="w-full flex flex-col gap-2 items-center">
+          <button
+            type="submit"
+            v-bind:disabled="disableSubmit"
+            v-bind:class="{
+              'cursor-pointer': !disableSubmit,
+              'cursor-not-allowed': disableSubmit,
+              'bg-brand-600/50': disableSubmit,
+              'bg-brand-600': !disableSubmit,
+              'hover:bg-brand-600/50': disableSubmit,
+              'hover:bg-brand-700': !disableSubmit,
+            }"
+            class="w-full rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition "
+          >
+            {{ editingId ? 'Actualizar item' : 'Crear item' }}
+          </button>
+          <div
+            @click="resetForm"
+            class="w-fit rounded-2xl cursor-pointer text-slate-700 border-slate-700 hover:bg-rose-400 px-4 py-3 border-1 text-sm font-semibold hover:text-white hover:border-rose-400 transition "
+          >
+            Limpiar información
+          </div>
+
+        </span>
       </template>
     </BaseForm>
 
-    <ItemList title="Items del vehículo en sesión" :items="currentItems" @edit="startEdit" @remove="removeItem" />
+    <ItemList title="Items del vehículo en sesión" :items="currentItems" @edit="startEdit" @changeItemStatus="changeItemStatus" @remove="removeItem" />
   </section>
 </template>
 
@@ -59,6 +77,8 @@ const form = reactive({
   nombre: '',
   activo: false,
 });
+
+const disableSubmit = computed(() => form.nombre == '' ? true : false);
 
 const currentVehiculo = computed(
   () => vehiculosStore.vehiculos.find((vehiculo) => vehiculo.matricula === selectedMatricula.value) ?? null,
@@ -102,6 +122,15 @@ const startEdit = (item: { id: number; nombre: string; activo: boolean }) => {
   editingId.value = item.id;
   form.nombre = item.nombre;
   form.activo = item.activo;
+};
+
+const changeItemStatus = async (item: { id: number; nombre: string; activo: boolean }) => {
+    await itemsStore.editItem(selectedMatricula.value, {
+      id: item.id,
+      nombre: item.nombre,
+      activo: !item.activo,
+    });
+    fetchVehiculos();
 };
 
 const removeItem = async (itemId: number) => {

@@ -16,8 +16,9 @@
       >
         <div class="flex items-center gap-3">
           <span
-            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-2xl font-bold"
-            :class="item.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+            class="inline-flex h-10 w-10 items-center cursor-pointer justify-center rounded-2xl text-2xl font-bold"
+            :class="item.activo ? 'bg-emerald-100 hover:bg-emerald-200 hover:ring-emerald-200 text-emerald-700' : 'bg-amber-100 hover:bg-amber-200 hover:ring-amber-200 text-amber-700'"
+            @click="$emit('changeItemStatus', item)"
           >
             {{ item.activo ? '✔' : '✖' }}
           </span>
@@ -30,14 +31,14 @@
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700"
+            class="rounded-xl border border-slate-200 hover:bg-black/5 hover:border-slate-500 cursor-pointer px-3 py-2 text-sm font-medium text-slate-700"
             @click="$emit('edit', item)"
           >
             Editar
           </button>
           <button
             type="button"
-            class="rounded-xl bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700"
+            class="rounded-xl border border-1 border-rose-50 bg-rose-50 hover:bg-rose-100 hover:border-rose-200 px-3 py-2 cursor-pointer text-sm font-medium text-rose-700"
             @click="$emit('remove', item.id)"
           >
             Eliminar
@@ -58,6 +59,7 @@ defineProps<{
 
 defineEmits<{
   (event: 'edit', item: Item): void;
+  (event: 'changeItemStatus', item: Item): void;
   (event: 'remove', itemId: number): void;
 }>();
 </script>
