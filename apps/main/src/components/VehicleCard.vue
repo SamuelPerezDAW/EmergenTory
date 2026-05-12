@@ -61,7 +61,7 @@ defineEmits<{
 const totalCount = computed(() => {
   let count = 0
   props.vehicle.lista.forEach((checklist) => {
-    count += checklist.items.filter((item) => !item.activo).length
+    count += checklist.items.length
   })
   return count
 });
