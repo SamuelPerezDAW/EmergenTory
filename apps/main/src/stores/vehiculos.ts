@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getVehiculoByMatricula, getVehiculos } from '@/services/vehiculoService';
+import { getVehiculoByMatricula, getVehiculos, createVehiculo} from '@/services/vehiculoService';
 import type { Vehiculo } from '@/types';
 
 export const useVehiculosStore = defineStore('vehiculos', () => {
@@ -34,6 +34,23 @@ export const useVehiculosStore = defineStore('vehiculos', () => {
     const newVehicle = await getVehiculoByMatricula(matricula)
     return typeof newVehicle === 'object' && newVehicle?.length !== 0 ? newVehicle[0] : null;
   };
+
+  const saveVehiculo = async (nextVehiculo: Vehiculo) => {
+    loading.value = true;
+    try {
+      const createdVehiculo = await createVehiculo(nextVehiculo);
+
+      if (createdVehiculo) {
+        await fetchVehiculos();
+      }
+
+    } catch (error) {
+      console.error("ERROR: ", error);
+
+    } finally {
+      loading.value = false;
+    }
+  }
 
   const updateVehiculo = (nextVehiculo: Vehiculo) => {
     vehiculos.value = vehiculos.value.map((vehiculo) =>

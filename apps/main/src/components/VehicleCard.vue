@@ -1,5 +1,5 @@
 <template>
-  <article class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+  <article class="rounded-4xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
     <div class="flex items-start justify-between gap-4">
       <div>
         <p class="text-md font-semibold tracking-[0.3em]">Categoría: <b class="text-brand-600 uppercase text-base">{{ categorias.find((cat) => cat.clave === vehicle.categoria)?.valor ?? 'NaN' }}</b></p>

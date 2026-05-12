@@ -55,17 +55,16 @@
           <span>Modelo</span>
           <input v-model="vehicleToCreate.modelo" class="w-full rounded-2xl border border-slate-200 px-4 py-3" />
         </label>
-        <label title="Categoría" class="block space-y-2 text-sm font-medium text-slate-700">
+        <div class="block space-y-2 text-sm font-medium text-slate-700">
           <span>Categoría</span>
-          <input v-model="vehicleToCreate.categoria" class="w-full rounded-2xl border border-slate-200 px-4 py-3" />
-        </label>
-        <select
-          v-model="filters.categoria"
-          title="Categoría"
-          class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
-        >
-          <option v-for="categoria in categorias" :title="categoria.valor" :key="categoria.clave" :value="categoria.clave">{{ categoria.valor }}</option>
-        </select>
+          <select
+            v-model="vehicleToCreate.categoria"
+            title="Categoría"
+            class="rounded-2xl block space-y-2 font-medium text-slate-700 border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
+          >
+            <option v-for="categoria in categorias" :title="categoria.valor" :key="categoria.clave" :value="categoria.clave">{{ categoria.valor }}</option>
+          </select>
+        </div>
         <button type="button" class="w-full cursor-pointer rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white" @click="saveVehicle">
           Guardar cambios
         </button>
@@ -107,7 +106,7 @@ const closeModal = async () => {
 };
 
 const saveVehicle = () => {
-
+  
 }
 
 const handleSelect = async (matricula: string) => {

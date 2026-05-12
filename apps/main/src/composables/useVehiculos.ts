@@ -13,16 +13,20 @@ export function useVehiculos() {
 
   const categorias: {'clave': string, 'valor': string}[] = [
     {
+      "clave": 'Todas',
+      "valor": 'Todas'
+    },
+    {
       "clave": 'BOM',
-      "valor": 'Bomberos'
+      "valor": 'Bombero'
     },
     {
       "clave": 'POL',
-      "valor": 'Policias'
+      "valor": 'Policia'
     },
     {
       "clave": 'AMB',
-      "valor": 'Ambulancias'
+      "valor": 'Ambulancia'
     },
   ];  
   const selectedVehicleCount = ref(0);
@@ -33,7 +37,7 @@ export function useVehiculos() {
         vehiculo.matricula.toLowerCase().includes(filters.search.toLowerCase()) ||
         vehiculo.marca.toLowerCase().includes(filters.search.toLowerCase()) ||
         vehiculo.modelo.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesCategory = filters.categoria === 'Todas' || vehiculo.categoria === filters.categoria;
+      const matchesCategory = filters.categoria === 'Todas' || categorias.find((cat) => cat.clave === vehiculo.categoria)?.clave === filters.categoria;
       return matchesSearch && matchesCategory;
     }),
   );

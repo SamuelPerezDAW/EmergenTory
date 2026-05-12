@@ -49,3 +49,31 @@ export async function getVehiculoByMatricula(matricula: string): Promise<Vehicul
     return [] as Vehiculo[];
   }
 }
+
+export async function createVehiculo(vehiculo: Vehiculo): Promise<Vehiculo[] | undefined> {
+  await wait(200);
+
+  const response = await axios.post(`http://127.0.0.1:8000/api/vehicles/add/`, {
+    vehiculo
+  }, {
+    headers: {
+      "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
+    },
+  });
+
+  const status: number = response.status;
+  const data: any[] = response.data;
+
+  if (status == 200) {
+    if (typeof data === 'object') {
+      return structuredClone(data);
+
+    } else {
+      return [] as Vehiculo[];
+    }
+    
+  } else {
+    console.error("ERROR: Error ", status, " al hacer la petición");
+    return [] as Vehiculo[];
+  }
+}
