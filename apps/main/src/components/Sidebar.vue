@@ -44,6 +44,8 @@
 
 <script setup lang="ts">
 import { RouterLink, useRoute } from 'vue-router';
+import { computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
 defineProps<{
   open: boolean;
@@ -56,11 +58,13 @@ defineEmits<{
 }>();
 
 const route = useRoute();
+const authStore = useAuthStore();
 
-const items = [
+const items = computed(() => [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/perfil', label: 'Perfil' },
   { to: '/vehiculos', label: 'Vehículos' },
   { to: '/items', label: 'Items' },
-];
+  ...(authStore.user?.perfil.admin ? [{ to: '/usuarios', label: 'Usuarios' }] : []),
+]);
 </script>

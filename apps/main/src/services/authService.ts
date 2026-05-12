@@ -20,7 +20,7 @@ export function convertPassword(password: string, hashedPassword: string) {
 
 const wait = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function mapProfileResponse(data: any): Usuario {
+export function mapProfileResponse(data: any): Usuario {
   return {
     id: data.usuario.id,
     username: data.usuario.nombre_usuario,

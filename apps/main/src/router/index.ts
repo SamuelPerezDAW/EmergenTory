@@ -6,6 +6,7 @@ import PerfilView from '@/views/PerfilView.vue';
 import VehiculosView from '@/views/VehiculosView.vue';
 import VehiculoDetalleView from '@/views/VehiculoDetalleView.vue';
 import ItemsManagementView from '@/views/ItemsManagementView.vue';
+import UsuariosManagementView from '@/views/UsuariosManagementView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -17,6 +18,7 @@ const router = createRouter({
     { path: '/vehiculos', name: 'vehiculos', component: VehiculosView, meta: { requiresAuth: true } },
     { path: '/vehiculos/:matricula', name: 'vehiculo-detalle', component: VehiculoDetalleView, meta: { requiresAuth: true } },
     { path: '/items', name: 'items', component: ItemsManagementView, meta: { requiresAuth: true } },
+    { path: '/usuarios', name: 'usuarios', component: UsuariosManagementView, meta: { requiresAuth: true, requiresAdmin: true } },
   ],
   scrollBehavior() {
     return { top: 0 };
@@ -32,6 +34,10 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.guestOnly && authStore.isAuthenticated) {
+    return { name: 'dashboard' };
+  }
+
+  if (to.meta.requiresAdmin && !authStore.user?.perfil.admin) {
     return { name: 'dashboard' };
   }
 

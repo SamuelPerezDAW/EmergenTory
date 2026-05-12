@@ -14,6 +14,18 @@ from .serializers import ProfileSerializer
 
 @csrf_exempt
 @require_http_methods('GET')
+@auth_required
+@require_admin
+def list_users(request):
+    profiles = Profile.objects.select_related('usuario', 'usuario__token').order_by(
+        'usuario__username'
+    )
+    serializer = ProfileSerializer(profiles, request=request)
+    return serializer.json_response()
+
+
+@csrf_exempt
+@require_http_methods('GET')
 def user_profile(request, nombre_usuario: str):
     try:
         profile = Profile.objects.get(usuario__username=nombre_usuario)
@@ -63,6 +75,19 @@ def add_user(request):
             last_name=payload['apellido'],
             email=payload['email'],
         )
+        profile = Profile.objects.get(usuario=user)
+
+        if 'bio' in payload:
+            profile.bio = payload['bio']
+
+        if 'telefono' in payload:
+            profile.telefono = payload['telefono'] or None
+
+        if 'admin' in payload:
+            profile.admin = bool(payload['admin'])
+
+        profile.full_clean()
+        profile.save()
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Json inválido'}, status=400)
@@ -72,7 +97,8 @@ def add_user(request):
 
     except IntegrityError:
         return JsonResponse({'error': 'El usuario ya existe'}, status=400)
-    return JsonResponse({'id': user.pk})
+    serializer = ProfileSerializer(profile, request=request)
+    return serializer.json_response()
 
 
 @csrf_exempt
@@ -156,6 +182,10 @@ def mod_profile(request, nombre_usuario):
             if 'telefono' in payload:
                 perfil_original.telefono = payload['telefono'] or None
                 data['actualizados'].append({'perfil': 'telefono'})
+
+            if 'admin' in payload and perfil_validar.admin:
+                perfil_original.admin = payload['admin'] in [True, 'true', 'True', '1', 1]
+                data['actualizados'].append({'perfil': 'admin'})
 
             if 'avatar' in request.FILES:
                 perfil_original.avatar = request.FILES['avatar']

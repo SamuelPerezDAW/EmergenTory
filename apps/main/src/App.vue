@@ -40,6 +40,7 @@ const pageTitle = computed(() => {
     '/perfil': 'Perfil de usuario',
     '/vehiculos': 'Vehículos',
     '/items': 'Gestión de items',
+    '/usuarios': 'Gestión de usuarios',
   };
 
   if (route.path.startsWith('/vehiculos/')) {
