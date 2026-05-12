@@ -61,6 +61,7 @@ import ItemList from '@/components/ItemList.vue';
 import { useItemsStore } from '@/stores/items';
 import { useVehiculosStore } from '@/stores/vehiculos';
 import type { Item, Vehiculo } from '@/types';
+import { isAdmin } from '@/composables/useAuth';
 
 const route = useRoute();
 const vehiculosStore = useVehiculosStore();
@@ -95,6 +96,7 @@ const saveItem = async () => {
   if (!vehiculo.value) return;
   await itemsStore.editItem(vehiculo.value.matricula, { ...editableItem });
   await loadVehiculo();
+  
   closeModal();
 };
 
