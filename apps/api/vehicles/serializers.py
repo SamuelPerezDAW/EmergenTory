@@ -13,8 +13,6 @@ class VehicleSerializer(BaseSerializer):
             'categoria': instance.categoria
             if not isinstance(instance, dict)
             else instance['categoria'],
-            # 'lista': ChecklistSerializer(instance.lista).serialize() if instance.lista else '',
-            # 'lista': instance.lista if instance['lista'] else '',
         }
 
         if not isinstance(instance, dict):
