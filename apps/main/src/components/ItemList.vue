@@ -16,10 +16,10 @@
       >
         <div class="flex items-center gap-3">
           <span
-            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-bold"
+            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-2xl font-bold"
             :class="item.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
           >
-            {{ item.activo ? 'OK' : 'KO' }}
+            {{ item.activo ? '✔' : '✖' }}
           </span>
           <div>
             <p class="font-semibold text-slate-900">{{ item.nombre }}</p>

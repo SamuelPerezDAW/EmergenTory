@@ -2,9 +2,14 @@
   <article class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
     <div class="flex items-start justify-between gap-4">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-brand-600">{{ vehicle.categoria }}</p>
-        <h3 class="mt-2 text-xl font-semibold text-slate-900">{{ vehicle.marca }} {{ vehicle.modelo }}</h3>
-        <p class="mt-1 text-sm text-slate-500">{{ vehicle.matricula }}</p>
+        <p class="text-md font-semibold tracking-[0.3em]">Categoría: <b class="text-brand-600 uppercase text-base">{{ vehicle.categoria }}</b></p>
+        <p class="mt-1 text-sm text-slate-500">Matrícula: {{ vehicle.matricula }}</p>
+        <h3 class="mt-2 text-md font-semibold text-slate-900">
+          Marca: 
+          <b class="rounded-full bg-brand-50 px-3 py-1 text-base font-semibold text-brand-700">{{ vehicle.marca }}</b> 
+          Modelo: 
+          <b class="rounded-full bg-brand-50 px-3 py-1 text-base font-semibold text-brand-700">{{ vehicle.modelo }}</b>
+        </h3>
       </div>
       <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
         {{ activeCount }}/{{ totalCount }} items activos
