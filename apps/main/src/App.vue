@@ -49,7 +49,9 @@ const pageTitle = computed(() => {
   return labels[route.path] ?? 'EmergenTory';
 });
 
-const sessionText = computed(() => sessionStorage.getItem('selected_vehicle') || 'Sin vehículo seleccionado');
+const sessionText = computed(() => sessionStorage.getItem('emergentory_user') 
+  ? JSON.parse(sessionStorage.getItem('emergentory_user') ?? '')['username'] 
+  : 'Sin usuario loggeado');
 
 const handleLogout = async () => {
   authStore.logout();

@@ -47,7 +47,7 @@ import { RouterLink, useRoute } from 'vue-router';
 
 defineProps<{
   open: boolean;
-  sessionText: string;
+  sessionText: string | string[];
 }>();
 
 defineEmits<{

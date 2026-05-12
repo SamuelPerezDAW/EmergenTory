@@ -80,7 +80,6 @@ import type { SessionSummary } from '@/types';
 const router = useRouter();
 const { vehiculos, activeItems } = useVehiculos();
 
-console.log("DashboardView: Estos son los vehiculos ", vehiculos)
 const featuredVehiculos = computed(() => vehiculos.value.slice(0, 2));
 const totalVehiculos = computed(() => vehiculos.value.length);
 const sessionSummary = reactive<SessionSummary>({
