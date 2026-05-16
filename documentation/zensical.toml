@@ -304,4 +304,5 @@ toggle.name = "Switch to light mode"
 #icon = "fontawesome/brands/github"
 #link = "https://github.com/user/repo"
 
-
+[server]
+p = 7000
