@@ -20,6 +20,7 @@ apps/
 - [Guía de Usuario](guia_usuario.md)
 - [Base de Datos](bbdd.md)
 - [Aplicación con Vue](vue.md)
+- [Diseño Web](diseño_web.md)
 - [API](api.md)
 
 ## Tecnologías
