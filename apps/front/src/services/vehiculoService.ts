@@ -1,12 +1,14 @@
 import type { Vehiculo } from '@/types';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const wait = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function getVehiculos(): Promise<Vehiculo[]> {
   await wait();
 
-  const response = await axios.get(`http://127.0.0.1:8000/api/vehicles/`, {});
+  const response = await axios.get(`${API_URL}/api/vehicles/`, {});
 
   const status: number = response.status;
   const data: any[] = response.data;
@@ -28,7 +30,7 @@ export async function getVehiculos(): Promise<Vehiculo[]> {
 export async function getVehiculoByMatricula(matricula: string): Promise<Vehiculo[] | undefined> {
   await wait(200);
 
-  const response = await axios.get(`http://127.0.0.1:8000/api/vehicles/?matricula=${matricula}`, {
+  const response = await axios.get(`${API_URL}/api/vehicles/?matricula=${matricula}`, {
     
   });
 
@@ -52,7 +54,7 @@ export async function getVehiculoByMatricula(matricula: string): Promise<Vehicul
 export async function createVehiculo(vehiculo: Vehiculo): Promise<Vehiculo[] | undefined> {
   await wait(200);
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/vehicles/add/`, {
+  const response = await axios.post(`${API_URL}/api/vehicles/add/`, {
     'matricula': vehiculo.matricula,
     'marca': vehiculo.marca,
     'modelo': vehiculo.modelo,
@@ -83,7 +85,7 @@ export async function createVehiculo(vehiculo: Vehiculo): Promise<Vehiculo[] | u
 export async function removeVehiculo(matricula: string): Promise<void> {
   await wait(200);
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/vehicles/${matricula}/del/`, { }, {
+  const response = await axios.post(`${API_URL}/api/vehicles/${matricula}/del/`, { }, {
     headers: {
       "Authorization": `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
     },

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    image: samuelpinfo/emergentory-api:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./bbdd:/app/bbdd
+      # Volumen con todo el código fuente de la imagen
+      - src_api:/app
+    environment:
+      - DEV=True
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py createsuperuser --noinput || true &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    image: samuelpinfo/emergentory-front:latest
+    volumes:
+      # Volumen con todo el código fuente de la imagen
+      - src_front:/app
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+
+volumes:
+  src_api:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './api'
+  src_front:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './front'

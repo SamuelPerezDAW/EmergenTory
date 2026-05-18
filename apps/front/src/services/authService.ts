@@ -2,7 +2,7 @@ import type { AuthPayload, Usuario } from '@/types';
 import axios from 'axios';
 
 const wait = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
-const API_URL = 'http://127.0.0.1:8000/api/users';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function mapProfileResponse(data: any): Usuario {
   return {
@@ -23,7 +23,7 @@ export function mapProfileResponse(data: any): Usuario {
 export async function loginService(payload: AuthPayload): Promise<{ token: string; user: Usuario } | undefined | null> {
   await wait();
 
-  const response = await axios.post(`${API_URL}/login/`, {
+  const response = await axios.post(`${API_URL}/api/users/login/`, {
     nombre_usuario: payload.username,
     contraseña: payload.password,
   });
@@ -41,7 +41,7 @@ export async function loginService(payload: AuthPayload): Promise<{ token: strin
 export async function updateProfileService(username: string, payload: FormData): Promise<Usuario | undefined> {
   await wait();
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/users/profile/${username}/mod/`, payload, {
+  const response = await axios.post(`${API_URL}/api/users/profile/${username}/mod/`, payload, {
     headers: {
       Authorization: `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
     },
@@ -53,12 +53,12 @@ export async function updateProfileService(username: string, payload: FormData):
 }
 
 export async function requestPasswordResetService(email: string): Promise<string> {
-  const response = await axios.post(`${API_URL}/reset-password/`, { email });
+  const response = await axios.post(`${API_URL}/api/users/reset-password/`, { email });
   return response.data?.detail ?? 'Solicitud procesada.';
 }
 
 export async function confirmPasswordResetService(uid: string, token: string, password: string): Promise<string> {
-  const response = await axios.post(`${API_URL}/reset-password/confirm/`, {
+  const response = await axios.post(`${API_URL}/api/users/reset-password/confirm/`, {
     uid,
     token,
     contraseña: password,

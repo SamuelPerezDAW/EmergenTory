@@ -1,12 +1,14 @@
 import type { Item } from '@/types';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const wait = (ms = 180) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function createItemService(item: Item, matricula: string): Promise<Item | undefined> {
   await wait();
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/checklists/checkitems/add/`, {
+  const response = await axios.post(`${API_URL}/api/checklists/checkitems/add/`, {
     'nombre': item.nombre,
     'activo': item.activo,
     'checklist': matricula,
@@ -36,7 +38,7 @@ export async function createItemService(item: Item, matricula: string): Promise<
 export async function updateItemService(item: Item, matricula: string): Promise<Item | undefined> {
   await wait();
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/checklists/checkitems/mod/`, {
+  const response = await axios.post(`${API_URL}/api/checklists/checkitems/mod/`, {
     'id': item.id,
     'nombre': item.nombre,
     'activo': item.activo,
@@ -67,7 +69,7 @@ export async function updateItemService(item: Item, matricula: string): Promise<
 export async function deleteItemService(itemId: number): Promise<number | undefined> {
   await wait();
 
-  const response = await axios.post(`http://127.0.0.1:8000/api/checklists/checkitems/del/`, {
+  const response = await axios.post(`${API_URL}/api/checklists/checkitems/del/`, {
     'id': itemId,
   }, {
     headers: {

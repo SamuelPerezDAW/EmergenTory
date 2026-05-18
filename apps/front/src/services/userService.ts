@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Usuario } from '@/types';
 import { mapProfileResponse } from '@/services/authService';
 
-const API_URL = 'http://127.0.0.1:8000/api/users';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const authHeaders = () => ({
   Authorization: `Bearer ${sessionStorage.getItem('emergentory_token') ?? ''}`,
@@ -20,7 +20,7 @@ export interface UserCreatePayload {
 }
 
 export async function listUsersService(): Promise<Usuario[]> {
-  const response = await axios.get(`${API_URL}/`, {
+  const response = await axios.get(`${API_URL}/api/users/`, {
     headers: authHeaders(),
   });
 
@@ -32,7 +32,7 @@ export async function listUsersService(): Promise<Usuario[]> {
 }
 
 export async function createUserService(payload: UserCreatePayload): Promise<Usuario | undefined> {
-  const response = await axios.post(`${API_URL}/add/`, payload, {
+  const response = await axios.post(`${API_URL}/api/users/add/`, payload, {
     headers: authHeaders(),
   });
 
@@ -43,7 +43,7 @@ export async function createUserService(payload: UserCreatePayload): Promise<Usu
 
 export async function deleteUserService(username: string): Promise<void> {
   await axios.post(
-    `${API_URL}/profile/${username}/del/`,
+    `${API_URL}/profile/${username}/api/users/del/`,
     {},
     {
       headers: authHeaders(),

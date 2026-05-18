@@ -8,8 +8,10 @@ from .models import Profile, Token
 @receiver(post_save, sender=get_user_model())
 def create_user_profile(sender, instance, created, raw, using, update_fields, **kwargs):
     if created:
-        Profile.objects.create(usuario=instance)
-
+        if instance.pk == 1:
+            Profile.objects.create(usuario=instance, admin=True)
+        else:
+            Profile.objects.create(usuario=instance)
 
 @receiver(post_save, sender=get_user_model())
 def create_user_token(sender, instance, created, raw, using, update_fields, **kwargs):
