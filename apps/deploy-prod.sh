@@ -7,6 +7,7 @@ if [ -z $1 ]; then
 fi
 
 DESTINO="$1"
+SERVIDOR=$(echo "$DESTINO" | cut -d'@' -f2)
 
 FILE="docker-compose.yml"
 
@@ -27,7 +28,8 @@ ssh -t $1 "
     sudo docker compose -f ${FILE} pull &&
     
     echo '=== 3. Iniciando contenedores en segundo plano ===' &&
-    sudo docker compose -f ${FILE} up -d &&
+    export PROD_SERVER='${SERVIDOR}' &&
+    sudo -E docker compose -f ${FILE} up -d &&
     
     echo '------------------------------------------------------------------' &&
     echo '✅ Despliegue completado con éxito.' &&
