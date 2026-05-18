@@ -29,7 +29,7 @@ ssh -t $1 "
     
     echo '=== 3. Iniciando contenedores en segundo plano ===' &&
     export PROD_SERVER='${SERVIDOR}' &&
-    sudo -E docker compose -f ${FILE} up -d &&
+    sudo -E PROD_SERVER=\${PROD_SERVER} docker compose -f ${FILE} up -d &&
     
     echo '------------------------------------------------------------------' &&
     echo '✅ Despliegue completado con éxito.' &&
