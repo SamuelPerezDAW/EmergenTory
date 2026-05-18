@@ -9,6 +9,8 @@ def send_reset_password_email(user_id, uid, token) -> None:
     user = get_user_model().objects.get(pk=user_id)
     reset_url = f'{settings.FRONTEND_URL}/reset-password/{uid}/{token}'
 
+    print(f'RESET_PASSWORD_URL={reset_url}')
+
     send_mail(
         'Restablecer contraseña en EmergenTory',
         (
