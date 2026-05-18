@@ -22,15 +22,35 @@ apps/
 - [Aplicación con Vue](vue.md)
 - [Diseño Web](diseño_web.md)
 - [API](api.md)
+- [Dockerización](docker.md)
+
+## Arranque en Desarrollo
+
+Backend y Frontend:
+
+```bash
+cd apps/
+source deploy-dev.sh
+```
+
+## Arranque en Producción
+
+Backend y Frontend:
+
+```bash
+cd apps/
+source deploy-prod.sh grupo07@emergentory.arkania.es
+```
 
 ## Tecnologías
 
-| Área | Tecnología |
-| --- | --- |
-| Frontend | Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios, Tailwind CSS |
-| Backend | Django, Python |
-| Base de datos | SQLite en desarrollo |
-| Documentación | Zensical y Markdown |
+| Área          | Tecnología                                                      |
+| ------------- | --------------------------------------------------------------- |
+| Frontend      | Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios, Tailwind CSS |
+| Backend       | Django, Python                                                  |
+| Base de datos | SQLite en desarrollo                                            |
+| Documentación | Zensical y Markdown                                             |
+| Dockerización | Docker y Docker-compose                                         |
 
 ## Resumen Funcional
 
@@ -41,26 +61,3 @@ La aplicación permite:
 - Gestionar vehículos de emergencia.
 - Crear y mantener checklists por vehículo.
 - Gestionar usuarios desde perfiles administradores.
-
-## Arranque en Desarrollo
-
-Backend:
-
-```bash
-cd apps/api
-python manage.py runserver
-```
-
-Frontend:
-
-```bash
-cd apps/main
-npm run dev
-```
-
-Documentación:
-
-```bash
-cd documentation
-zensical serve
-```
