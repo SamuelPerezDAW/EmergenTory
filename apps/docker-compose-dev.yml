@@ -4,7 +4,7 @@ services:
   backend:
     image: samuelpinfo/emergentory-api:latest
     ports:
-      - "8000:8000"
+      - "7000:7000"
     volumes:
       - ./bbdd:/app/bbdd
       # Volumen con todo el código fuente de la imagen
@@ -19,7 +19,7 @@ services:
       sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
              python manage.py createsuperuser --noinput || true &&
-             python manage.py runserver 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:7000"
 
   frontend:
     image: samuelpinfo/emergentory-front:latest
@@ -29,7 +29,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:7000
 
 volumes:
   src_api:
