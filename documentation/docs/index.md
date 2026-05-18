@@ -23,6 +23,7 @@ apps/
 - [Diseño Web](diseño_web.md)
 - [API](api.md)
 - [Dockerización](docker.md)
+- [Máquina de Producción](docker.md)
 
 ## Arranque en Desarrollo
 
