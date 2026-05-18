@@ -1,15 +1,20 @@
 import json
 
-from django.contrib.auth import get_user_model, hashers
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.http import JsonResponse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.csrf import csrf_exempt
 from shared.decorators import require_admin, require_http_methods
 
 from .decorators import auth_required
 from .models import Profile, Token
 from .serializers import ProfileSerializer
+from .tasks import send_reset_password_email
 
 
 @csrf_exempt
@@ -36,6 +41,101 @@ def user_profile(request, nombre_usuario: str):
     serializer = ProfileSerializer(profile, request=request)
 
     return serializer.json_response()
+
+
+@csrf_exempt
+@require_http_methods('POST')
+def login_user(request):
+    try:
+        payload = json.loads(request.body)
+        username = payload.get('nombre_usuario') or payload.get('username')
+        password = payload.get('contraseña') or payload.get('password')
+
+        if not username or not password:
+            return JsonResponse({'error': 'Faltan credenciales'}, status=400)
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            return JsonResponse({'error': 'Credenciales inválidas'}, status=401)
+
+        profile = Profile.objects.select_related('usuario', 'usuario__token').get(usuario=user)
+        return JsonResponse(
+            {
+                'token': str(user.token.key),
+                'user': ProfileSerializer(profile, request=request).serialize(),
+            }
+        )
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Json inválido'}, status=400)
+
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Perfil no existe'}, status=404)
+
+
+@csrf_exempt
+@require_http_methods('POST')
+def request_password_reset(request):
+    try:
+        payload = json.loads(request.body)
+        email = payload.get('email', '').strip()
+
+        if not email:
+            return JsonResponse({'error': 'Falta el campo email'}, status=400)
+
+        user = get_user_model().objects.filter(email=email).first()
+
+        if user:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            send_reset_password_email.delay(user.pk, uid, token)
+
+        return JsonResponse(
+            {
+                'detail': (
+                    'Si existe un usuario con ese correo, se enviará un enlace para '
+                    'restablecer la contraseña.'
+                )
+            }
+        )
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Json inválido'}, status=400)
+
+
+@csrf_exempt
+@require_http_methods('POST')
+def confirm_password_reset(request):
+    try:
+        payload = json.loads(request.body)
+        uid = payload.get('uid')
+        token = payload.get('token')
+        password = payload.get('contraseña') or payload.get('password')
+
+        if not uid or not token or not password:
+            return JsonResponse({'error': 'Faltan campos obligatorios'}, status=400)
+
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = get_user_model().objects.get(pk=user_id)
+
+        if not default_token_generator.check_token(user, token):
+            return JsonResponse({'error': 'Token inválido o caducado'}, status=400)
+
+        validate_password(password, user)
+        user.set_password(password)
+        user.save()
+
+        return JsonResponse({'detail': 'Contraseña actualizada correctamente'})
+
+    except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+        return JsonResponse({'error': 'Token inválido'}, status=400)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Json inválido'}, status=400)
+
+    except ValidationError as error:
+        return JsonResponse({'error': error.messages}, status=400)
 
 
 @csrf_exempt
@@ -68,9 +168,9 @@ def add_user(request):
         if 'email' not in payload:
             payload['email'] = ''
 
-        user = get_user_model().objects.create(
+        user = get_user_model().objects.create_user(
             username=payload['nombre_usuario'],
-            password=hashers.make_password(payload['contraseña'], salt=None, hasher='default'),
+            password=payload['contraseña'],
             first_name=payload['nombre'],
             last_name=payload['apellido'],
             email=payload['email'],
@@ -172,7 +272,7 @@ def mod_profile(request, nombre_usuario):
                 data['actualizados'].append({'usuario': 'email'})
 
             if 'contraseña' in payload:
-                user.password = payload['contraseña']
+                user.set_password(payload['contraseña'])
                 data['actualizados'].append({'usuario': 'contraseña'})
 
             if 'bio' in payload:
@@ -228,37 +328,22 @@ def mod_profile(request, nombre_usuario):
 @auth_required
 def reset_password(request, nombre_usuario):
     try:
-        payload = json.loads(request.body)
         bearer_token = request.headers.get('Authorization', '')
         token = Token.objects.get(key=bearer_token.split('Bearer ')[1])
 
         perfil_validar = Profile.objects.get(usuario=token.usuario)
         perfil_original = Profile.objects.get(usuario__username=nombre_usuario)
-        mod_user = get_user_model().objects.filter(username=nombre_usuario)
+        user = perfil_original.usuario
 
-        data = {'actualizados': []}
-        if Profile.objects.get(usuario=token.usuario).admin:
-            if 'contraseña' in payload:
-                data['actualizados'] += {
-                    'id': mod_user.update(
-                        password=hashers.make_password(
-                            payload['contraseña'], salt=None, hasher='default'
-                        ),
-                    )
-                }
-
-        elif perfil_original == perfil_validar:
-            if 'contraseña' in payload:
-                data['actualizados'] += {
-                    'id': mod_user.update(
-                        password=hashers.make_password(
-                            payload['contraseña'], salt=None, hasher='default'
-                        ),
-                    )
-                }
-
-        else:
+        if not Profile.objects.get(usuario=token.usuario).admin and perfil_original != perfil_validar:
             return JsonResponse({'error': 'No tienes permisos para esta operación'}, status=403)
+
+        if not user.email:
+            return JsonResponse({'error': 'El usuario no tiene email configurado'}, status=400)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        reset_token = default_token_generator.make_token(user)
+        send_reset_password_email.delay(user.pk, uid, reset_token)
 
     except Token.DoesNotExist:
         return JsonResponse({'error': 'Token no existe'}, status=404)
@@ -272,4 +357,4 @@ def reset_password(request, nombre_usuario):
     except get_user_model().DoesNotExist:
         return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
-    return JsonResponse(data)
+    return JsonResponse({'detail': 'Correo de restablecimiento encolado'})

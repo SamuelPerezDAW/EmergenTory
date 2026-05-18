@@ -12,7 +12,7 @@ class TokenSerializer(BaseSerializer):
         if not self.fields or 'usuario' in self.fields:
             data['usuario'] = UserSerializer(
                 instance.usuario,
-                fields=['id', 'nombre_usuario', 'npmbre', 'apellido', 'email', 'contraseña'],
+                fields=['id', 'nombre_usuario', 'nombre', 'apellido', 'email'],
             ).serialize()
 
         return data
@@ -26,7 +26,6 @@ class UserSerializer(BaseSerializer):
             'nombre': instance.first_name,
             'apellido': instance.last_name,
             'email': instance.email,
-            'contraseña': instance.password,
         }
 
 

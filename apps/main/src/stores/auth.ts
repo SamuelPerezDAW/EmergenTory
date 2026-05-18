@@ -30,12 +30,12 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     try {
       const response = await loginService(payload);
-      if (!response) return null;
+      if (!response) return false;
       persistSession(response.token, response.user);
-      
+      return true;
+
     } finally {
       loading.value = false;
-      return true;
     }
   };
 

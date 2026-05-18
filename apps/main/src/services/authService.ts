@@ -1,24 +1,8 @@
 import type { AuthPayload, Usuario } from '@/types';
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
-
-export function convertPassword(password: string, hashedPassword: string) {
-  const parts = hashedPassword.split('$');
-  if (parts.length !== 4) return false;
-
-  const [, iterations, salt, originalHash] = parts;
-
-  const derivedKey = CryptoJS.PBKDF2(password, salt, {
-    keySize: 256 / 32,
-    iterations: parseInt(iterations, 10),
-    hasher: CryptoJS.algo.SHA256
-  });
-
-  const base64Hash = CryptoJS.enc.Base64.stringify(derivedKey);
-  return base64Hash;
-}
 
 const wait = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
+const API_URL = 'http://127.0.0.1:8000/api/users';
 
 export function mapProfileResponse(data: any): Usuario {
   return {
@@ -39,31 +23,19 @@ export function mapProfileResponse(data: any): Usuario {
 export async function loginService(payload: AuthPayload): Promise<{ token: string; user: Usuario } | undefined | null> {
   await wait();
 
-  const response = await axios.get(`http://127.0.0.1:8000/api/users/profile/${payload.username}`)
+  const response = await axios.post(`${API_URL}/login/`, {
+    nombre_usuario: payload.username,
+    contraseña: payload.password,
+  });
 
-  const {
-    status,
-    data
-  } = response;
-
-  if (status == 200){  
-    try {
-      if (
-        data.usuario.nombre_usuario === payload.username &&
-        convertPassword(payload.password, data.usuario.contraseña) === data.usuario.contraseña.split("$")[3]
-      ){
-        return {
-          token: data.token.key,
-          user: mapProfileResponse(data),
-        };
-      }
-    } catch(error) {
-      console.log("ERROR: ", error);
-    }
-    
-  } else {
-    console.error("ERROR: Error ", status, " al hacer la petición");
+  if (response.status === 200 && response.data?.token && response.data?.user) {
+    return {
+      token: response.data.token,
+      user: mapProfileResponse(response.data.user),
+    };
   }
+
+  return null;
 }
 
 export async function updateProfileService(username: string, payload: FormData): Promise<Usuario | undefined> {
@@ -78,4 +50,18 @@ export async function updateProfileService(username: string, payload: FormData):
   if (response.status === 200 && response.data?.perfil) {
     return mapProfileResponse(response.data.perfil);
   }
+}
+
+export async function requestPasswordResetService(email: string): Promise<string> {
+  const response = await axios.post(`${API_URL}/reset-password/`, { email });
+  return response.data?.detail ?? 'Solicitud procesada.';
+}
+
+export async function confirmPasswordResetService(uid: string, token: string, password: string): Promise<string> {
+  const response = await axios.post(`${API_URL}/reset-password/confirm/`, {
+    uid,
+    token,
+    contraseña: password,
+  });
+  return response.data?.detail ?? 'Contraseña actualizada.';
 }

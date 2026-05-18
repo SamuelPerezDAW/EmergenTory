@@ -4,7 +4,10 @@ import type { AuthPayload } from '@/types';
 
 const isSubmitting = ref(false);
 
-export const isAdmin = computed<boolean>(() => JSON.parse(sessionStorage.getItem('emergentory_user') ?? '')['perfil']['admin'])
+export const isAdmin = computed<boolean>(() => {
+  const user = JSON.parse(sessionStorage.getItem('emergentory_user') ?? 'null');
+  return Boolean(user?.perfil?.admin);
+});
 
 export function useAuth() {
   const authStore = useAuthStore();

@@ -22,9 +22,22 @@ Authorization: Bearer <uuid-del-token>
 
 El token se crea automáticamente al crear un usuario. En el frontend se guarda en `sessionStorage` con la clave `emergentory_token`.
 
-!!! warning "Inicio de sesión actual"
+## Login
 
-    El login del frontend consulta el perfil del usuario y compara la contraseña en cliente con el hash devuelto por la API. Esto funciona con la implementación actual, pero no es el flujo recomendado para producción porque expone el hash de contraseña en la respuesta del perfil.
+```http
+POST /api/users/login/
+```
+
+Valida las credenciales en Django mediante `authenticate()` y devuelve el token junto al perfil del usuario.
+
+```json
+{
+  "nombre_usuario": "operador",
+  "contraseña": "contraseña"
+}
+```
+
+La contraseña no se valida en el frontend y el hash no se devuelve en la API.
 
 ## Usuarios
 
@@ -110,19 +123,49 @@ Elimina el usuario. Al estar relacionados por `CASCADE`, también se eliminan su
 ### Reiniciar contraseña
 
 ```http
-POST /api/users/profile/<nombre_usuario>/reset-password/
+POST /api/users/reset-password/
 ```
 
-Actualiza la contraseña del usuario.
+Solicita un correo de restablecimiento. La petición responde siempre con un mensaje genérico para no revelar si el email existe.
 
 ```json
 {
+  "email": "usuario@test.com"
+}
+```
+
+El envío del correo se encola con `django-rq`. El worker genera el correo con un enlace al frontend:
+
+```text
+http://localhost:5173/reset-password/<uid>/<token>
+```
+
+### Confirmar nueva contraseña
+
+```http
+POST /api/users/reset-password/confirm/
+```
+
+Valida el `uid` y el `token` generados por Django y actualiza la contraseña con `set_password()`.
+
+```json
+{
+  "uid": "MQ",
+  "token": "token-generado",
   "contraseña": "nueva-contraseña"
 }
 ```
 
+### Solicitar reset para un usuario concreto
+
+```http
+POST /api/users/profile/<nombre_usuario>/reset-password/
+```
+
+Encola un correo de restablecimiento para ese usuario.
+
 - Requiere token.
-- Puede usarlo un administrador o el usuario propietario.
+- Puede solicitarlo un administrador o el usuario propietario.
 
 ## Vehículos
 

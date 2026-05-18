@@ -13,6 +13,7 @@ const router = createRouter({
   routes: [
     { path: '/', redirect: '/dashboard' },
     { path: '/auth', name: 'auth', component: AuthView, meta: { guestOnly: true } },
+    { path: '/reset-password/:uid/:token', name: 'reset-password', component: AuthView, meta: { guestOnly: true } },
     { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
     { path: '/perfil', name: 'perfil', component: PerfilView, meta: { requiresAuth: true } },
     { path: '/vehiculos', name: 'vehiculos', component: VehiculosView, meta: { requiresAuth: true } },

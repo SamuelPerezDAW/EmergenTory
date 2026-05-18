@@ -129,6 +129,10 @@ STATIC_URL = 'static/'
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
+FRONTEND_URL = 'http://localhost:5173'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@emergentory.local'
+
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',

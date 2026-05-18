@@ -62,6 +62,7 @@ Define las rutas principales:
 | --- | --- | --- |
 | `/` | Redirige a `/dashboard` | - |
 | `/auth` | `AuthView` | Solo invitados |
+| `/reset-password/:uid/:token` | `AuthView` | Solo invitados |
 | `/dashboard` | `DashboardView` | Usuario autenticado |
 | `/perfil` | `PerfilView` | Usuario autenticado |
 | `/vehiculos` | `VehiculosView` | Usuario autenticado |
@@ -81,7 +82,7 @@ Contiene las pantallas completas que se cargan desde el router:
 
 | Vista | Función |
 | --- | --- |
-| `AuthView.vue` | Formulario de inicio de sesión. |
+| `AuthView.vue` | Login, solicitud de recuperación y confirmación de nueva contraseña. |
 | `DashboardView.vue` | Panel principal operativo. |
 | `PerfilView.vue` | Consulta y edición del perfil del usuario. |
 | `VehiculosView.vue` | Listado y creación de vehículos. |
@@ -143,7 +144,7 @@ Contiene la comunicación con la API mediante Axios.
 
 | Servicio | Responsabilidad |
 | --- | --- |
-| `authService.ts` | Login, mapeo de perfil y actualización del perfil. |
+| `authService.ts` | Login, mapeo de perfil, actualización del perfil y reset de contraseña. |
 | `vehiculoService.ts` | Listar, filtrar, crear y eliminar vehículos. |
 | `itemService.ts` | Crear, modificar y eliminar items. |
 | `userService.ts` | Listar, crear y eliminar usuarios. |
@@ -187,10 +188,20 @@ Contiene lógica reutilizable basada en Composition API.
 1. El usuario introduce credenciales en `AuthView`.
 2. `useAuth` llama a `authStore.login`.
 3. `authStore.login` usa `loginService`.
-4. `loginService` consulta `/api/users/profile/<username>/`.
-5. Si las credenciales coinciden, guarda token y usuario en Pinia y `sessionStorage`.
+4. `loginService` envía las credenciales a `/api/users/login/`.
+5. Django valida la contraseña con `authenticate()` y devuelve token y perfil.
 6. El router permite acceder a las rutas privadas mientras exista token.
 7. Al cerrar sesión se eliminan los datos de sesión y se redirige a `/auth`.
+
+## Flujo de Recuperación de Contraseña
+
+1. Desde `AuthView`, el usuario pulsa `Olvidé mi contraseña`.
+2. El frontend envía el email a `/api/users/reset-password/`.
+3. La API genera `uid` y `token`, y encola el correo con `django-rq`.
+4. El enlace lleva a `/reset-password/:uid/:token`.
+5. El usuario introduce la nueva contraseña.
+6. El frontend llama a `/api/users/reset-password/confirm/`.
+7. Django valida el token y guarda la contraseña con `set_password()`.
 
 ## Flujo de Vehículos e Items
 
