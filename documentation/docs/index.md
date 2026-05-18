@@ -2,178 +2,64 @@
 icon: lucide/rocket
 ---
 
-# Introducción
+# EmergenTory
 
-EmergenTory es una aplicación web de código abierto de gestión de inventariado para vehículos de emergencia. Toda la aplicación está desarrollada tanto en VUE (Typescript), para la interfaz gráfica, como en Django (Python), para la API.
+EmergenTory es una aplicación web para gestionar el inventariado y las listas de revisión de vehículos de emergencia. La solución está dividida en una aplicación frontend con Vue y una API backend con Django.
 
-La aplicación está pensada para ser gestionadas de manera privada por los empleados de una empresa tanto pública como privada.
+## Estructura del Proyecto
 
-# Índice
+```text
+apps/
+├── api/      # Backend Django
+├── main/     # Frontend Vue
+└── bbdd/     # Espacio reservado para base de datos
+```
+
+## Documentación
 
 - [Guía de Usuario](guia_usuario.md)
 - [Base de Datos](bbdd.md)
-- [Plan de Sostenibilidad](plan_sostenibilidad.md)
-- [Aplicación con VUE](vue.md)
+- [Aplicación con Vue](vue.md)
 - [API](api.md)
 
-# Get started
+## Tecnologías
 
-For full documentation visit [zensical.org](https://zensical.org/docs/).
+| Área | Tecnología |
+| --- | --- |
+| Frontend | Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios, Tailwind CSS |
+| Backend | Django, Python |
+| Base de datos | SQLite en desarrollo |
+| Documentación | Zensical y Markdown |
 
-## Commands
+## Resumen Funcional
 
-- [`zensical new`][new] - Create a new project
-- [`zensical serve`][serve] - Start local web server
-- [`zensical build`][build] - Build your site
+La aplicación permite:
 
-  [new]: https://zensical.org/docs/usage/new/
-  [serve]: https://zensical.org/docs/usage/preview/
-  [build]: https://zensical.org/docs/usage/build/
+- Iniciar sesión con usuarios registrados.
+- Consultar y editar el perfil del usuario.
+- Gestionar vehículos de emergencia.
+- Crear y mantener checklists por vehículo.
+- Gestionar usuarios desde perfiles administradores.
 
-## Examples
+## Arranque en Desarrollo
 
-### Admonitions
+Backend:
 
-> Go to [documentation](https://zensical.org/docs/authoring/admonitions/)
-
-!!! note
-
-    This is a **note** admonition. Use it to provide helpful information.
-
-!!! warning
-
-    This is a **warning** admonition. Be careful!
-
-### Details
-
-> Go to [documentation](https://zensical.org/docs/authoring/admonitions/#collapsible-blocks)
-
-??? info "Click to expand for more info"
-
-    This content is hidden until you click to expand it.
-    Great for FAQs or long explanations.
-
-## Code Blocks
-
-> Go to [documentation](https://zensical.org/docs/authoring/code-blocks/)
-
-```python hl_lines="2" title="Code blocks"
-def greet(name):
-    print(f"Hello, {name}!") # (1)!
-
-greet("Python")
+```bash
+cd apps/api
+python manage.py runserver
 ```
 
-1.  > Go to [documentation](https://zensical.org/docs/authoring/code-blocks/#code-annotations)
+Frontend:
 
-    Code annotations allow to attach notes to lines of code.
-
-Code can also be highlighted inline: `#!python print("Hello, Python!")`.
-
-## Content tabs
-
-> Go to [documentation](https://zensical.org/docs/authoring/content-tabs/)
-
-=== "Python"
-
-    ``` python
-    print("Hello from Python!")
-    ```
-
-=== "Rust"
-
-    ``` rs
-    println!("Hello from Rust!");
-    ```
-
-## Diagrams
-
-> Go to [documentation](https://zensical.org/docs/authoring/diagrams/)
-
-```mermaid
-graph LR
-  A[Start] --> B{Error?};
-  B -->|Yes| C[Hmm...];
-  C --> D[Debug];
-  D --> B;
-  B ---->|No| E[Yay!];
+```bash
+cd apps/main
+npm run dev
 ```
 
-## Footnotes
+Documentación:
 
-> Go to [documentation](https://zensical.org/docs/authoring/footnotes/)
-
-Here's a sentence with a footnote.[^1]
-
-Hover it, to see a tooltip.
-
-[^1]: This is the footnote.
-
-## Formatting
-
-> Go to [documentation](https://zensical.org/docs/authoring/formatting/)
-
-- ==This was marked (highlight)==
-- ^^This was inserted (underline)^^
-- ~~This was deleted (strikethrough)~~
-- H~2~O
-- A^T^A
-- ++ctrl+alt+del++
-
-## Icons, Emojis
-
-> Go to [documentation](https://zensical.org/docs/authoring/icons-emojis/)
-
-- :sparkles: `:sparkles:`
-- :rocket: `:rocket:`
-- :tada: `:tada:`
-- :memo: `:memo:`
-- :eyes: `:eyes:`
-
-## Maths
-
-> Go to [documentation](https://zensical.org/docs/authoring/math/)
-
-$$
-\cos x=\sum_{k=0}^{\infty}\frac{(-1)^k}{(2k)!}x^{2k}
-$$
-
-!!! warning "Needs configuration"
-Note that MathJax is included via a `script` tag on this page and is not
-configured in the generated default configuration to avoid including it
-in a pages that do not need it. See the documentation for details on how
-to configure it on all your pages if they are more Maths-heavy than these
-simple starter pages.
-
-<script id="MathJax-script" async src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [["\\(", "\\)"]],
-      displayMath: [["\\[", "\\]"]],
-      processEscapes: true,
-      processEnvironments: true
-    },
-    options: {
-      ignoreHtmlClass: ".*|",
-      processHtmlClass: "arithmatex"
-    }
-  };
-</script>
-
-## Task Lists
-
-> Go to [documentation](https://zensical.org/docs/authoring/lists/#using-task-lists)
-
-- [x] Install Zensical
-- [x] Configure `zensical.toml`
-- [x] Write amazing documentation
-- [ ] Deploy anywhere
-
-## Tooltips
-
-> Go to [documentation](https://zensical.org/docs/authoring/tooltips/)
-
-[Hover me][example]
-
-[example]: https://example.com "I'm a tooltip!"
+```bash
+cd documentation
+zensical serve
+```

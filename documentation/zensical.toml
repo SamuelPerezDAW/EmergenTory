@@ -305,4 +305,4 @@ toggle.name = "Switch to light mode"
 #link = "https://github.com/user/repo"
 
 [server]
-p = 7000
+port = 7000

@@ -2,129 +2,269 @@
 icon: lucide/cable
 ---
 
-La API está hecha en el Framework Django, en el cual está desarrollado en el lenguaje de programación Python.
+# API
 
-## Objetivo
+La API de EmergenTory está desarrollada con Django y expone endpoints HTTP en formato JSON para que la aplicación Vue pueda consultar y modificar usuarios, vehículos y checklists.
 
-La implementación de esa API tiene como objetivo agilizar la gestión de la base de datos desde el frontend, ejecutando estos métodos en el backend.
+La URL base en desarrollo es:
 
-## Peticiones
-
-Las siguientes peticiones se realizarán desde el frontend a la API en el backend utilizando los métodos a travez de las URI
-
-??? info "Uso de peticiones"
-
-    Algunas peticiones están restringidas a ciertos permisos de administrador o requiere de ser el usuario propietario
-
-### Usuario
-
-Permite añadir un usuario a la base de datos, este crea un perfil y un token de manera automática para el usuario recien añadido
-
-```
-  POST: /api/users/add/
+```text
+http://127.0.0.1:8000
 ```
 
-- [x] Admin necesario
+## Autenticación
 
-### Perfil
+La autenticación se realiza con un token propio guardado en el modelo `Token`. Las peticiones protegidas deben enviar la cabecera:
 
-Obtiene el perfil del usuario
-
-```
-  GET: /api/users/profile/nombre_usuario/
+```http
+Authorization: Bearer <uuid-del-token>
 ```
 
-- [x] Admin necesario
-- [x] Token propietario necesario
+El token se crea automáticamente al crear un usuario. En el frontend se guarda en `sessionStorage` con la clave `emergentory_token`.
 
-Modifica la información del perfil de un usuario
+!!! warning "Inicio de sesión actual"
 
-```
-  POST: /api/users/profile/nombre_usuario/mod/
-```
+    El login del frontend consulta el perfil del usuario y compara la contraseña en cliente con el hash devuelto por la API. Esto funciona con la implementación actual, pero no es el flujo recomendado para producción porque expone el hash de contraseña en la respuesta del perfil.
 
-- [x] Admin necesario
-- [x] Token propietario necesario
+## Usuarios
 
-Elimina el usuario junto a su perfil y token de la base de datos
+### Listar usuarios
 
-```
-  POST: /api/users/profile/nombre_usuario/del/
+```http
+GET /api/users/
 ```
 
-- [x] Admin necesario
-- [x] Token propietario necesario
+Devuelve los perfiles de usuario ordenados por nombre de usuario.
 
-Reinicia la contraseña en caso de perderla mediante un correo electrónico
+- Requiere token.
+- Requiere perfil administrador.
 
-```
-  POST: /api/users/profile/nombre_usuario/reset-password/
-```
+### Crear usuario
 
-- [x] Admin necesario
-- [x] Token propietario necesario
-
-### Vehiculo
-
-Lista los vehiculos guardados en la base de datos
-
-```
-  GET: /api/users/vehicles/
+```http
+POST /api/users/add/
 ```
 
-Añade un nuevo vehiculo a la base de datos que a su vez genera una checklist para este vehículo
+Crea un usuario de Django y, mediante señales, también crea su `Profile` y su `Token`.
 
-```
-  POST: /api/users/vehicles/add/
-```
+Campos aceptados:
 
-- [x] Admin necesario
+| Campo | Obligatorio | Descripción |
+| --- | --- | --- |
+| `nombre_usuario` | Sí | Nombre de usuario. No puede contener espacios. |
+| `contraseña` | Sí | Contraseña inicial. Se guarda hasheada. |
+| `nombre` | No | Nombre. |
+| `apellido` | No | Apellido. |
+| `email` | No | Correo electrónico. |
+| `bio` | No | Biografía del perfil. |
+| `telefono` | No | Teléfono validado por expresión regular. |
+| `admin` | No | Marca el perfil como administrador. |
 
-Elimina el vehiculo seleccionado junto a su checklist con todos los respectivos items asignados
+- Requiere token.
+- Requiere perfil administrador.
 
-```
-  POST: /api/users/vehicles/del/
-```
+### Obtener perfil
 
-- [x] Admin necesario
-
-### Checklist
-
-Permite revisar las listas de la base de datos
-
-```
-  POST: /api/checklists/
-```
-
-### Checkitem
-
-Permite revisar los items de cada lista
-
-```
-  POST: /api/checklists/checkitems/
+```http
+GET /api/users/profile/<nombre_usuario>/
 ```
 
-Añade un item a una lista en concreto
+Devuelve el perfil, los datos del usuario y el token asociado.
 
-```
-  POST: /api/checklists/checkitems/add/
-```
+### Modificar perfil
 
-- [x] Admin necesario
-- [x] Token propietario necesario
-
-Modifica el item de la lista seleccionada
-
-```
-  POST: /api/checklists/matricula/nombre_item/mod/
+```http
+POST /api/users/profile/<nombre_usuario>/mod/
 ```
 
-- [x] Admin necesario
+Permite actualizar datos del usuario y del perfil. Acepta JSON o `multipart/form-data` cuando se actualiza el avatar.
 
-Elimina el item de la lista seleccionada
+Campos aceptados:
 
+| Campo | Descripción |
+| --- | --- |
+| `nombre_usuario` | Nuevo nombre de usuario. |
+| `nombre` | Nombre. |
+| `apellidos` | Apellidos. |
+| `email` | Correo electrónico. |
+| `contraseña` | Nueva contraseña. |
+| `bio` | Biografía. |
+| `telefono` | Teléfono. |
+| `admin` | Solo puede cambiarlo un administrador. |
+| `avatar` | Archivo de imagen en `multipart/form-data`. |
+
+- Requiere token.
+- Puede modificarlo un administrador o el usuario propietario.
+
+### Eliminar usuario
+
+```http
+POST /api/users/profile/<nombre_usuario>/del/
 ```
-  POST: /api/checklists/matricula/nombre_item/del/
+
+Elimina el usuario. Al estar relacionados por `CASCADE`, también se eliminan su perfil y token.
+
+- Requiere token.
+- Puede eliminarlo un administrador o el usuario propietario.
+
+### Reiniciar contraseña
+
+```http
+POST /api/users/profile/<nombre_usuario>/reset-password/
 ```
 
-- [x] Admin necesario
+Actualiza la contraseña del usuario.
+
+```json
+{
+  "contraseña": "nueva-contraseña"
+}
+```
+
+- Requiere token.
+- Puede usarlo un administrador o el usuario propietario.
+
+## Vehículos
+
+### Listar vehículos
+
+```http
+GET /api/vehicles/
+```
+
+Devuelve los vehículos con su checklist asociada. Permite filtros por query string:
+
+| Parámetro | Ejemplo |
+| --- | --- |
+| `matricula` | `/api/vehicles/?matricula=1234BCD` |
+| `marca` | `/api/vehicles/?marca=Mercedes` |
+| `modelo` | `/api/vehicles/?modelo=Sprinter` |
+| `categoria` | `/api/vehicles/?categoria=AMB` |
+
+### Crear vehículo
+
+```http
+POST /api/vehicles/add/
+```
+
+Crea un vehículo. Una señal crea automáticamente su checklist.
+
+```json
+{
+  "matricula": "1234BCD",
+  "marca": "Mercedes",
+  "modelo": "Sprinter",
+  "categoria": "AMB"
+}
+```
+
+Categorías permitidas:
+
+| Código | Categoría |
+| --- | --- |
+| `POL` | Policía |
+| `AMB` | Ambulancia |
+| `BOM` | Bombero |
+
+- Requiere token.
+- Requiere perfil administrador.
+
+### Cambiar imagen
+
+```http
+POST /api/vehicles/<matricula>/change_vehicle_image/
+```
+
+Actualiza el campo `imagen` del vehículo.
+
+- Requiere token.
+- Requiere perfil administrador.
+
+### Eliminar vehículo
+
+```http
+POST /api/vehicles/<matricula>/del/
+```
+
+Elimina el vehículo. Su checklist asociada se elimina por la relación `CASCADE`.
+
+- Requiere token.
+- Requiere perfil administrador.
+
+## Checklists
+
+### Listar checklists
+
+```http
+GET /api/checklists/
+```
+
+Devuelve las checklists con usuario, vehículo e items. Permite filtros:
+
+| Parámetro | Descripción |
+| --- | --- |
+| `usuario` | Filtra por nombre de usuario. |
+| `vehiculo` | Filtra por matrícula. |
+| `creado` | Filtra por fecha de creación exacta. |
+| `actualizado` | Filtra por fecha de actualización exacta. |
+
+### Listar items
+
+```http
+GET /api/checklists/checkitems/
+```
+
+Devuelve los items de checklist. Permite filtros:
+
+| Parámetro | Descripción |
+| --- | --- |
+| `nombre` | Filtra por nombre exacto. |
+| `activo` | Filtra por estado. |
+| `checklist` | Filtra por matrícula del vehículo. |
+
+### Crear item
+
+```http
+POST /api/checklists/checkitems/add/
+```
+
+```json
+{
+  "nombre": "Botiquín",
+  "activo": true,
+  "checklist": "1234BCD"
+}
+```
+
+- Requiere token.
+
+### Modificar item
+
+```http
+POST /api/checklists/checkitems/mod/
+```
+
+```json
+{
+  "id": 1,
+  "nombre": "Botiquín revisado",
+  "activo": false,
+  "checklist": "1234BCD"
+}
+```
+
+- Requiere token.
+
+### Eliminar item
+
+```http
+POST /api/checklists/checkitems/del/
+```
+
+```json
+{
+  "id": 1
+}
+```
+
+- Requiere token.
